@@ -28,7 +28,7 @@ export default function Sprint() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [hat, setHat] = useState<Hat>('white')
-  const [difficulty, setDifficulty] = useState<Difficulty | null>(null)
+  const [difficulty, setDifficulty] = useState<Difficulty>('Just right')
   const [turnCount, setTurnCount] = useState(0)
   const [warning, setWarning] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -66,7 +66,7 @@ export default function Sprint() {
         body: JSON.stringify({
           message: userText,
           hat,
-          difficulty: difficulty ?? undefined,
+          difficulty,
         }),
         credentials: 'include',
       })
@@ -79,7 +79,7 @@ export default function Sprint() {
         setMessages(prev => [...prev, { role: 'assistant', content: data.reply }])
         setTurnCount(data.turnCount)
         setWarning(data.warning)
-        setDifficulty(null) // reset after each send
+        setDifficulty('Just right') // reset to default after each send
       }
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Network error. Try again.' }])
@@ -174,13 +174,13 @@ export default function Sprint() {
       {lastIsAssistant && !loading && (
         <div className="border-t border-zinc-100 bg-white px-6 py-3">
           <div className="mx-auto max-w-lg">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-zinc-400 shrink-0">Last turn:</span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-zinc-400 shrink-0">How does this feel?</span>
               <div className="flex gap-2">
                 {(['Too easy', 'Just right', 'Too hard'] as Difficulty[]).map(d => (
                   <button
                     key={d}
-                    onClick={() => setDifficulty(prev => prev === d ? null : d)}
+                    onClick={() => setDifficulty(d)}
                     className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
                       difficulty === d
                         ? 'border-zinc-900 bg-zinc-900 text-white'
