@@ -50,17 +50,25 @@ export async function POST(req: NextRequest) {
     updated_at: new Date().toISOString(),
   })
 
-  // Load profile + goal + message history in parallel
-  const [{ data: profile }, { data: goal }, { data: history }] = await Promise.all([
+  // Load profile + goal in parallel
+  const [{ data: profile }, { data: goal }] = await Promise.all([
     supabase.from('profiles').select('*').eq('session_id', sessionId).single(),
     supabase.from('goals').select('*').eq('session_id', sessionId).single(),
-    supabase
-      .from('messages')
-      .select('role, content')
-      .eq('session_id', sessionId)
-      .order('created_at', { ascending: true })
-      .limit(20),
   ])
+
+  // Load only messages from the current sprint (after goal was last set)
+  const historyQuery = supabase
+    .from('messages')
+    .select('role, content')
+    .eq('session_id', sessionId)
+    .order('created_at', { ascending: true })
+    .limit(20)
+
+  if (goal?.updated_at) {
+    historyQuery.gt('created_at', goal.updated_at)
+  }
+
+  const { data: history } = await historyQuery
 
   // Build system prompt from profile + goal
   const systemPrompt = goal

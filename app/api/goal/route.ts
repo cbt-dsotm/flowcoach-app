@@ -16,9 +16,6 @@ export async function POST(req: NextRequest) {
 
   const supabase = createServiceClient()
 
-  // Clear message history so the new sprint starts fresh
-  await supabase.from('messages').delete().eq('session_id', sessionId)
-
   const { error } = await supabase.from('goals').upsert({
     session_id: sessionId,
     topic,
