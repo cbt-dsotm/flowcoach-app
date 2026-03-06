@@ -14,8 +14,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No session ID' }, { status: 400 })
   }
 
-  // Check turn count in Supabase
   const supabase = createServiceClient()
+
+  // Check turn count
   const { data: session, error } = await supabase
     .from('sessions')
     .select('turn_count')
@@ -41,6 +42,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Message required' }, { status: 400 })
   }
 
+  // Save user message
+  await supabase.from('messages').insert({
+    session_id: sessionId,
+    role: 'user',
+    content: message,
+  })
+
   // Call Claude
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
@@ -50,6 +58,13 @@ export async function POST(req: NextRequest) {
   })
 
   const reply = response.content[0].type === 'text' ? response.content[0].text : ''
+
+  // Save assistant message
+  await supabase.from('messages').insert({
+    session_id: sessionId,
+    role: 'assistant',
+    content: reply,
+  })
 
   // Upsert turn count
   await supabase.from('sessions').upsert({
