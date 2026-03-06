@@ -42,7 +42,7 @@ export default function Sprint() {
   useEffect(() => {
     if (started.current) return
     started.current = true
-    sendMessage('Start my sprint.', true)
+    sendMessage('Start my sprint. First, briefly introduce the topic and what we will cover. Then give your first explanation before any exercise.', true)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function sendMessage(text: string, isKickoff = false) {
