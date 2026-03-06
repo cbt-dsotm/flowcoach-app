@@ -42,6 +42,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Message required' }, { status: 400 })
   }
 
+  // Ensure session row exists before inserting messages (foreign key requirement)
+  await supabase.from('sessions').upsert({
+    id: sessionId,
+    turn_count: turnCount,
+    updated_at: new Date().toISOString(),
+  })
+
   // Save user message
   await supabase.from('messages').insert({
     session_id: sessionId,
@@ -66,12 +73,11 @@ export async function POST(req: NextRequest) {
     content: reply,
   })
 
-  // Upsert turn count
-  await supabase.from('sessions').upsert({
-    id: sessionId,
-    turn_count: turnCount + 1,
-    updated_at: new Date().toISOString(),
-  })
+  // Update turn count
+  await supabase
+    .from('sessions')
+    .update({ turn_count: turnCount + 1, updated_at: new Date().toISOString() })
+    .eq('id', sessionId)
 
   const newCount = turnCount + 1
   const warning = newCount >= TURN_WARNING && newCount < TURN_LIMIT
