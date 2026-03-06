@@ -195,7 +195,7 @@ export default function Sprint() {
             <textarea
               className="flex-1 resize-none rounded-xl border border-zinc-200 px-3 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none"
               rows={2}
-              placeholder="Answer the exercise… (Enter to send)"
+              placeholder="Answer the exercise, or ask your own question… (Enter to send)"
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
