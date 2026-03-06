@@ -209,11 +209,14 @@ export default function Sprint() {
               Send
             </button>
           </div>
-          <div className="flex justify-between">
+          <div className="flex items-center justify-between">
             <Link href="/goal" className="text-xs text-zinc-400 hover:text-zinc-600">
               ← Change goal
             </Link>
-            <Link href="/progress" className="text-xs text-zinc-400 hover:text-zinc-600">
+            <Link
+              href="/progress"
+              className="rounded-lg border border-zinc-300 px-4 py-2 text-xs font-semibold text-zinc-600 transition-colors hover:border-zinc-500 hover:text-zinc-900"
+            >
               Finish sprint →
             </Link>
           </div>
