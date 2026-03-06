@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import ReactMarkdown from 'react-markdown'
 
 type Hat = 'white' | 'yellow' | 'black' | 'red' | 'green' | 'blue'
 type Difficulty = 'Too easy' | 'Just right' | 'Too hard'
@@ -143,7 +144,13 @@ export default function Sprint() {
                   : 'mr-4 bg-white text-zinc-800 shadow-sm ring-1 ring-zinc-200'
               }`}
             >
-              <p className="whitespace-pre-wrap">{msg.content}</p>
+              {msg.role === 'assistant' ? (
+                <ReactMarkdown className="prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:my-2">
+                  {msg.content}
+                </ReactMarkdown>
+              ) : (
+                <p className="whitespace-pre-wrap">{msg.content}</p>
+              )}
             </div>
           ))}
 
