@@ -15,6 +15,12 @@ const LEARNING_MODES = [
       "Explore any topic through Edward de Bono's Six Thinking Hats. Switch perspectives mid-session. Stay in Flow.",
     href: '/goal',
     live: true,
+    cardClass:   'border-emerald-700 bg-emerald-600 shadow-sm',
+    nameClass:   'text-white',
+    taglineClass:'text-emerald-100',
+    descClass:   'text-emerald-200',
+    badgeClass:  '',
+    buttonClass: 'bg-white text-emerald-700 hover:bg-emerald-50',
   },
   {
     id: 'practice',
@@ -25,6 +31,12 @@ const LEARNING_MODES = [
       "Your coach asks you to retrieve, explain, and apply what you've learned. Feynman technique built in.",
     href: null,
     live: false,
+    cardClass:   'border-amber-200 bg-amber-50',
+    nameClass:   'text-amber-900',
+    taglineClass:'text-amber-700',
+    descClass:   'text-amber-600',
+    badgeClass:  'bg-amber-100 text-amber-700',
+    buttonClass: '',
   },
   {
     id: 'deep-dive',
@@ -35,6 +47,12 @@ const LEARNING_MODES = [
       'Tell the Instructor what you want to master. They map the dive plan — surface concepts to deep-water expertise — and guide every session until you certify.',
     href: null,
     live: false,
+    cardClass:   'border-teal-200 bg-teal-50',
+    nameClass:   'text-teal-900',
+    taglineClass:'text-teal-700',
+    descClass:   'text-teal-600',
+    badgeClass:  'bg-teal-100 text-teal-700',
+    buttonClass: '',
   },
   {
     id: 'flashcards',
@@ -45,6 +63,12 @@ const LEARNING_MODES = [
       'Cards generated from your learning sessions, scheduled when your brain is ready to consolidate.',
     href: null,
     live: false,
+    cardClass:   'border-orange-200 bg-orange-50',
+    nameClass:   'text-orange-900',
+    taglineClass:'text-orange-700',
+    descClass:   'text-orange-600',
+    badgeClass:  'bg-orange-100 text-orange-700',
+    buttonClass: '',
   },
   {
     id: 'quiz',
@@ -55,20 +79,26 @@ const LEARNING_MODES = [
       'Find exactly where you are and what to tackle next. No generic tests — calibrated to your level.',
     href: null,
     live: false,
+    cardClass:   'border-violet-200 bg-violet-50',
+    nameClass:   'text-violet-900',
+    taglineClass:'text-violet-700',
+    descClass:   'text-violet-600',
+    badgeClass:  'bg-violet-100 text-violet-700',
+    buttonClass: '',
   },
 ]
 
 const TOTAL_SECTIONS = 7
 
-const TIER_LABELS: Record<number, { label: string; tagline: string; pillClass: string }> = {
-  0: { label: 'Basic',       tagline: 'Generic coaching — same for everyone',                    pillClass: 'bg-zinc-100 text-zinc-600' },
-  1: { label: 'Good',        tagline: 'Claude knows your goal and background',                   pillClass: 'bg-blue-100 text-blue-700' },
-  2: { label: 'Good',        tagline: 'Claude knows your goal and background',                   pillClass: 'bg-blue-100 text-blue-700' },
-  3: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',           pillClass: 'bg-indigo-100 text-indigo-700' },
-  4: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',           pillClass: 'bg-indigo-100 text-indigo-700' },
-  5: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn',  pillClass: 'bg-emerald-100 text-emerald-700' },
-  6: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn',  pillClass: 'bg-emerald-100 text-emerald-700' },
-  7: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn',  pillClass: 'bg-emerald-100 text-emerald-700' },
+const TIER_LABELS: Record<number, { label: string; tagline: string; pillClass: string; accentBorder: string }> = {
+  0: { label: 'Basic',       tagline: 'Generic coaching — same for everyone',                   pillClass: 'bg-zinc-100 text-zinc-600',      accentBorder: 'border-l-zinc-300' },
+  1: { label: 'Good',        tagline: 'Claude knows your goal and background',                  pillClass: 'bg-blue-100 text-blue-700',       accentBorder: 'border-l-blue-400' },
+  2: { label: 'Good',        tagline: 'Claude knows your goal and background',                  pillClass: 'bg-blue-100 text-blue-700',       accentBorder: 'border-l-blue-400' },
+  3: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',          pillClass: 'bg-indigo-100 text-indigo-700',   accentBorder: 'border-l-indigo-400' },
+  4: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',          pillClass: 'bg-indigo-100 text-indigo-700',   accentBorder: 'border-l-indigo-400' },
+  5: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-100 text-emerald-700', accentBorder: 'border-l-emerald-400' },
+  6: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-100 text-emerald-700', accentBorder: 'border-l-emerald-400' },
+  7: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-100 text-emerald-700', accentBorder: 'border-l-emerald-400' },
 }
 
 interface LastGoal {
@@ -172,7 +202,7 @@ export default function Dashboard() {
         </div>
 
         {/* Coaching status — badge + tier + topic actions */}
-        <div className="mb-4 rounded-xl border border-zinc-200 bg-white px-5 py-4">
+        <div className={`mb-4 rounded-xl border border-zinc-100 border-l-4 bg-stone-50 px-5 py-4 ${tier.accentBorder}`}>
           <div className="flex items-center gap-4">
             <TierBadge label={tier.label} />
             <div className="flex flex-1 min-w-0 items-start justify-between gap-3">
@@ -253,66 +283,36 @@ export default function Dashboard() {
             Step 2 — Start learning
           </p>
           <div className="flex flex-col gap-3">
-            {LEARNING_MODES.map((mode) => {
-              const isDeepDive = mode.id === 'deep-dive'
-              return (
+            {LEARNING_MODES.map((mode) => (
               <div
                 key={mode.id}
-                className={`rounded-xl border px-5 py-4 transition-all ${
-                  mode.live
-                    ? 'border-zinc-900 bg-zinc-900 text-white shadow-sm'
-                    : isDeepDive
-                    ? 'border-teal-200 bg-teal-50'
-                    : 'border-zinc-200 bg-white text-zinc-400'
-                }`}
+                className={`rounded-xl border px-5 py-4 transition-all ${mode.cardClass}`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
                       <span className="text-base">{mode.icon}</span>
-                      <span
-                        className={`text-sm font-bold ${
-                          mode.live ? 'text-white' : isDeepDive ? 'text-teal-900' : 'text-zinc-400'
-                        }`}
-                      >
-                        {mode.name}
-                      </span>
+                      <span className={`text-sm font-bold ${mode.nameClass}`}>{mode.name}</span>
                       {!mode.live && (
-                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                          isDeepDive ? 'bg-teal-100 text-teal-700' : 'bg-zinc-100 text-zinc-400'
-                        }`}>
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${mode.badgeClass}`}>
                           🚧 Coming soon
                         </span>
                       )}
                     </div>
-                    <p
-                      className={`text-xs font-medium ${
-                        mode.live ? 'text-zinc-300' : isDeepDive ? 'text-teal-700' : 'text-zinc-400'
-                      }`}
-                    >
-                      {mode.tagline}
-                    </p>
-                    <p
-                      className={`mt-1 text-xs leading-relaxed ${
-                        mode.live ? 'text-zinc-400' : isDeepDive ? 'text-teal-600' : 'text-zinc-300'
-                      }`}
-                    >
-                      {mode.description}
-                    </p>
+                    <p className={`text-xs font-medium ${mode.taglineClass}`}>{mode.tagline}</p>
+                    <p className={`mt-1 text-xs leading-relaxed ${mode.descClass}`}>{mode.description}</p>
                   </div>
-
                   {mode.live && mode.href && (
                     <Link
                       href={mode.href}
-                      className="shrink-0 rounded-lg bg-white px-4 py-2 text-xs font-semibold text-zinc-900 transition-colors hover:bg-zinc-100"
+                      className={`shrink-0 rounded-lg px-4 py-2 text-xs font-semibold transition-colors ${mode.buttonClass}`}
                     >
                       Start →
                     </Link>
                   )}
                 </div>
               </div>
-              )
-            })}
+            ))}
           </div>
         </div>
 
