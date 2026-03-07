@@ -5,6 +5,46 @@ export interface LearnerProfile {
   feedback_style?: string | null
   session_length?: string | null
   notes?: string | null
+  // Rich profile sections from profile conversations
+  profile_data?: {
+    quick?: string | null
+    goal?: string | null
+    background?: string | null
+    knowledge?: string | null
+    what_worked?: string | null
+    learning_prefs?: string | null
+    emotional?: string | null
+  } | null
+}
+
+function buildRichProfileBlock(profile: LearnerProfile): string {
+  const pd = profile.profile_data
+  if (!pd) return buildFallbackProfileBlock(profile)
+
+  const sections: string[] = []
+  if (pd.quick) sections.push(`Profile overview: ${pd.quick}`)
+  if (pd.goal) sections.push(`Real goal: ${pd.goal}`)
+  if (pd.background) sections.push(`Background: ${pd.background}`)
+  if (pd.knowledge) sections.push(`Knowledge map: ${pd.knowledge}`)
+  if (pd.what_worked) sections.push(`Learning history: ${pd.what_worked}`)
+  if (pd.learning_prefs) sections.push(`Learning preferences: ${pd.learning_prefs}`)
+  if (pd.emotional) sections.push(`Emotional context: ${pd.emotional}`)
+
+  if (sections.length === 0) return buildFallbackProfileBlock(profile)
+  return sections.join('\n')
+}
+
+function buildFallbackProfileBlock(profile: LearnerProfile): string {
+  return [
+    `Energy right now: ${profile.energy ?? 'not specified'}`,
+    `Learns best by: ${profile.learning_style ?? 'not specified'}`,
+    `Focus pattern: ${profile.distraction_pattern ?? 'not specified'}`,
+    `Feedback preference: ${profile.feedback_style ?? 'not specified'}`,
+    `Session length: ${profile.session_length ?? 'not specified'}`,
+    profile.notes ? `Additional context: ${profile.notes}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n')
 }
 
 export interface LearnerGoal {
@@ -30,12 +70,7 @@ WHITE HAT MODE
 White Hat = facts, data, and verifiable information only. No opinion. No emotional coloring. No encouragement or motivational language. No speculation beyond what is known. Present information clearly, accurately, and precisely. If something is uncertain, say so plainly.
 
 LEARNER PROFILE
-- Energy right now: ${profile.energy ?? 'not specified'}
-- Learns best by: ${profile.learning_style ?? 'not specified'}
-- Focus pattern: ${profile.distraction_pattern ?? 'not specified'}
-- Feedback preference: ${profile.feedback_style ?? 'not specified'}
-- Session length: ${profile.session_length ?? 'not specified'}
-${profile.notes ? `- Additional context: ${profile.notes}` : ''}
+${buildRichProfileBlock(profile)}
 
 GOAL FOR THIS SESSION
 - Topic: ${goal.topic}
@@ -77,12 +112,7 @@ RED HAT MODE
 Red Hat = feelings, intuition, and emotional experience only. No analysis. No fixing. No explaining why the feeling is wrong or how to overcome it. The learner does not need to justify how they feel — feelings are valid without proof. Your job is to reflect, validate, and normalize. Make it safe to say "I'm overwhelmed" or "I hate this" without it being treated as a problem to solve.
 
 LEARNER PROFILE
-- Energy right now: ${profile.energy ?? 'not specified'}
-- Learns best by: ${profile.learning_style ?? 'not specified'}
-- Focus pattern: ${profile.distraction_pattern ?? 'not specified'}
-- Feedback preference: ${profile.feedback_style ?? 'not specified'}
-- Session length: ${profile.session_length ?? 'not specified'}
-${profile.notes ? `- Additional context: ${profile.notes}` : ''}
+${buildRichProfileBlock(profile)}
 
 GOAL FOR THIS SESSION
 - Topic: ${goal.topic}
@@ -125,12 +155,7 @@ GREEN HAT MODE
 Green Hat = creativity, lateral thinking, and generative exploration. No criticism allowed during Green Hat — all ideas are valid for now. Your job is to make the learner experience ${goal.topic} from a fresh angle: through analogy, metaphor, playful exercises, or unexpected connections. Do not explain — make them feel or discover. Speculation is welcome. "What if" is the operative phrase.
 
 LEARNER PROFILE
-- Energy right now: ${profile.energy ?? 'not specified'}
-- Learns best by: ${profile.learning_style ?? 'not specified'}
-- Focus pattern: ${profile.distraction_pattern ?? 'not specified'}
-- Feedback preference: ${profile.feedback_style ?? 'not specified'}
-- Session length: ${profile.session_length ?? 'not specified'}
-${profile.notes ? `- Additional context: ${profile.notes}` : ''}
+${buildRichProfileBlock(profile)}
 
 GOAL FOR THIS SESSION
 - Topic: ${goal.topic}
