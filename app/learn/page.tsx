@@ -46,7 +46,7 @@ function LearnContent() {
   const confidence = searchParams.get('confidence') ? Number(searchParams.get('confidence')) : null
 
   const [activeHat, setActiveHat] = useState<Hat>('white')
-  const [activeVersion, setActiveVersion] = useState<Version>('default')
+  const [hatVersions, setHatVersions] = useState<Partial<Record<Hat, Version>>>({})
   const [cache, setCache] = useState<Partial<Record<CacheKey, string>>>({})
   const [loading, setLoading] = useState<Set<CacheKey>>(new Set())
   const contentRef = useRef<HTMLDivElement>(null)
@@ -127,19 +127,22 @@ function LearnContent() {
 
   function selectHat(hat: Hat) {
     setActiveHat(hat)
-    setActiveVersion('default')
     contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
     maybeGenerate(hat, 'default')
-    maybeGenerate(hat, 'easier')
-    maybeGenerate(hat, 'deeper')
+    if (!cache[cacheKey(hat, 'default')]) {
+      // First visit — preload variants
+      maybeGenerate(hat, 'easier')
+      maybeGenerate(hat, 'deeper')
+    }
   }
 
   function applyDifficulty(version: 'easier' | 'deeper') {
-    setActiveVersion(version)
+    setHatVersions(prev => ({ ...prev, [activeHat]: version }))
     contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
     maybeGenerate(activeHat, version)
   }
 
+  const activeVersion = hatVersions[activeHat] ?? 'default'
   const activeKey = cacheKey(activeHat, activeVersion)
   const content = cache[activeKey]
   const isActiveLoading = loading.has(activeKey)
