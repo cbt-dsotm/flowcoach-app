@@ -247,6 +247,85 @@ function TierBadgeWithTooltip({ label, size = 44 }: { label: string; size?: numb
   )
 }
 
+function TopicSelector({ lastGoal }: { lastGoal: LastGoal | null }) {
+  const [open, setOpen] = useState(false)
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function handleEnter() {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+    setOpen(true)
+  }
+
+  function handleLeave() {
+    closeTimer.current = setTimeout(() => setOpen(false), 120)
+  }
+
+  const learnHref = lastGoal
+    ? `/learn?topic=${encodeURIComponent(lastGoal.topic)}${lastGoal.win_condition ? `&win=${encodeURIComponent(lastGoal.win_condition)}` : ''}${lastGoal.confidence ? `&confidence=${lastGoal.confidence}` : ''}`
+    : '/goal'
+
+  return (
+    <div className="relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+      {lastGoal ? (
+        <Link
+          href={learnHref}
+          className="text-sm font-bold text-zinc-800 hover:text-zinc-600 truncate max-w-[280px] block"
+          title={lastGoal.topic}
+        >
+          {lastGoal.topic}
+        </Link>
+      ) : (
+        <span className="cursor-default text-sm font-bold text-zinc-400">
+          No topic yet
+        </span>
+      )}
+
+      {open && (
+        <div
+          className="absolute left-0 top-full z-20 mt-1 w-68 min-w-[260px] rounded-xl border border-zinc-200 bg-white p-3 shadow-xl"
+          onMouseEnter={handleEnter}
+          onMouseLeave={handleLeave}
+        >
+          {lastGoal ? (
+            <>
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                Topics
+              </p>
+              <Link
+                href={learnHref}
+                className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-zinc-50"
+              >
+                <span className="text-[10px] text-zinc-500">●</span>
+                <span className="truncate text-xs font-semibold text-zinc-900">{lastGoal.topic}</span>
+              </Link>
+              <div className="mt-2 flex items-center gap-2 px-2 py-1">
+                <span className="text-[10px] text-zinc-300">+</span>
+                <span className="text-xs text-zinc-300">New topic</span>
+                <span className="rounded-full bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-300">
+                  🚧 soon
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-xs font-semibold text-zinc-700">No topics yet</p>
+              <p className="mt-1 text-[11px] leading-snug text-zinc-400">
+                Topics you explore in Learn mode appear here. Pick up where you left off or switch between subjects.
+              </p>
+              <Link
+                href="/goal"
+                className="mt-2.5 block text-xs font-medium text-indigo-600 hover:text-indigo-800"
+              >
+                Start your first session →
+              </Link>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Dashboard() {
   const router = useRouter()
   const [email, setEmail] = useState<string | null>(null)
@@ -345,24 +424,8 @@ export default function Dashboard() {
         </div>
 
         {/* Topic row — below the rule, above mode cards */}
-        <div className="mb-4 flex items-center gap-4">
-          {lastGoal ? (
-            <Link
-              href={`/learn?topic=${encodeURIComponent(lastGoal.topic)}${lastGoal.win_condition ? `&win=${encodeURIComponent(lastGoal.win_condition)}` : ''}${lastGoal.confidence ? `&confidence=${lastGoal.confidence}` : ''}`}
-              className="max-w-[240px] truncate text-sm font-medium text-zinc-700 hover:text-zinc-900"
-              title={lastGoal.topic}
-            >
-              Continue: {lastGoal.topic} →
-            </Link>
-          ) : (
-            <span className="text-sm text-zinc-400">No topic yet</span>
-          )}
-          <span className="cursor-default select-none text-xs text-zinc-400">
-            Pick a topic{' '}
-            <span className="rounded-full bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-400">
-              🚧 soon
-            </span>
-          </span>
+        <div className="mb-4">
+          <TopicSelector lastGoal={lastGoal} />
         </div>
 
         {/* Learning modes */}
