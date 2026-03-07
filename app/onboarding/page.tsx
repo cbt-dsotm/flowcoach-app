@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface ChoiceQuestion {
@@ -76,6 +76,13 @@ export default function Onboarding() {
   const [current, setCurrent] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    if (!document.cookie.includes('session_id=')) {
+      const id = crypto.randomUUID()
+      document.cookie = `session_id=${id}; path=/; max-age=86400`
+    }
+  }, [])
 
   const question = QUESTIONS[current]
   const isLast = current === QUESTIONS.length - 1
