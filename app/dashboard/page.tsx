@@ -204,7 +204,7 @@ export default function Dashboard() {
             <span className="text-xs text-zinc-300 cursor-default select-none">
               Pick a topic
               <span className="ml-1 rounded-full bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-400">
-                soon
+                🚧 soon
               </span>
             </span>
           </div>
@@ -244,7 +244,7 @@ export default function Dashboard() {
                         <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                           isDeepDive ? 'bg-teal-100 text-teal-700' : 'bg-zinc-100 text-zinc-400'
                         }`}>
-                          Coming soon
+                          🚧 Coming soon
                         </span>
                       )}
                     </div>
