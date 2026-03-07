@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 type Hat = 'white' | 'yellow' | 'black' | 'red' | 'green' | 'blue'
 
@@ -172,7 +173,7 @@ function LearnContent() {
       >
         {content ? (
           <div className="prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-headings:my-3">
-            <ReactMarkdown>{content}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
             {isStreaming && (
               <span className="inline-block h-3 w-0.5 animate-pulse bg-zinc-400 ml-0.5" />
             )}
