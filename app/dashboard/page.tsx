@@ -13,7 +13,7 @@ const MODES = [
     tagline: 'Six thinking lenses, one concept',
     description:
       'Explore any topic through Edward de Bono\'s Six Thinking Hats. Switch perspectives mid-session. Stay in Flow.',
-    href: '/onboarding',
+    href: '/goal',
     live: true,
   },
   {
