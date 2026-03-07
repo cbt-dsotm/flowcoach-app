@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 
@@ -9,12 +9,12 @@ type Hat = 'white' | 'yellow' | 'black' | 'red' | 'green' | 'blue'
 type Difficulty = 'easier' | 'deeper'
 
 const HATS: { id: Hat; label: string; description: string; activeClass: string }[] = [
-  { id: 'white',  label: 'White',  description: 'Facts',     activeClass: 'border-zinc-900 bg-zinc-900 text-white' },
-  { id: 'yellow', label: 'Yellow', description: 'Benefits',  activeClass: 'border-yellow-500 bg-yellow-400 text-yellow-900' },
-  { id: 'black',  label: 'Black',  description: 'Risks',     activeClass: 'border-zinc-800 bg-zinc-800 text-zinc-100' },
-  { id: 'red',    label: 'Red',    description: 'Feelings',  activeClass: 'border-red-500 bg-red-500 text-white' },
-  { id: 'green',  label: 'Green',  description: 'Ideas',     activeClass: 'border-green-500 bg-green-500 text-white' },
-  { id: 'blue',   label: 'Blue',   description: 'Process',   activeClass: 'border-blue-500 bg-blue-500 text-white' },
+  { id: 'white',  label: 'White',  description: 'Facts',    activeClass: 'border-zinc-900 bg-zinc-900 text-white' },
+  { id: 'yellow', label: 'Yellow', description: 'Benefits', activeClass: 'border-yellow-500 bg-yellow-400 text-yellow-900' },
+  { id: 'black',  label: 'Black',  description: 'Risks',    activeClass: 'border-zinc-800 bg-zinc-800 text-zinc-100' },
+  { id: 'red',    label: 'Red',    description: 'Feelings', activeClass: 'border-red-500 bg-red-500 text-white' },
+  { id: 'green',  label: 'Green',  description: 'Ideas',    activeClass: 'border-green-500 bg-green-500 text-white' },
+  { id: 'blue',   label: 'Blue',   description: 'Process',  activeClass: 'border-blue-500 bg-blue-500 text-white' },
 ]
 
 const HAT_DESCRIPTIONS: Record<Hat, string> = {
@@ -27,7 +27,6 @@ const HAT_DESCRIPTIONS: Record<Hat, string> = {
 }
 
 function LearnContent() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const topic = searchParams.get('topic') ?? ''
   const winCondition = searchParams.get('win') ?? null
@@ -35,7 +34,7 @@ function LearnContent() {
 
   const [activeHat, setActiveHat] = useState<Hat>('white')
   const [cache, setCache] = useState<Partial<Record<Hat, string>>>({})
-  const [loading, setLoading] = useState<Hat | null>(null)
+  const [loadingHats, setLoadingHats] = useState<Set<Hat>>(new Set())
   const [lastDifficulty, setLastDifficulty] = useState<Difficulty | null>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
@@ -44,8 +43,20 @@ function LearnContent() {
     if (topic) generateContent('white', null)
   }, [topic]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Background preload remaining hats once white hat has content
+  useEffect(() => {
+    if (!cache['white']) return
+    const remaining: Hat[] = ['yellow', 'black', 'red', 'green', 'blue']
+    remaining.forEach(hat => {
+      if (!cache[hat] && !loadingHats.has(hat)) generateContent(hat, null)
+    })
+  }, [!!cache['white']]) // eslint-disable-line react-hooks/exhaustive-deps
+
   async function generateContent(hat: Hat, difficultyInstruction: string | null) {
-    setLoading(hat)
+    if (loadingHats.has(hat)) return
+
+    setLoadingHats(prev => new Set(prev).add(hat))
+
     try {
       const res = await fetch('/api/hat-content', {
         method: 'POST',
@@ -58,23 +69,41 @@ function LearnContent() {
           difficulty_instruction: difficultyInstruction,
         }),
       })
-      const data = await res.json()
-      if (data.content) {
-        setCache(prev => ({ ...prev, [hat]: data.content }))
-        contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+
+      if (!res.body) throw new Error('No response body')
+
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let content = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        content += decoder.decode(value, { stream: true })
+        setCache(prev => ({ ...prev, [hat]: content }))
       }
     } catch {
-      // fail silently — show error in content area
       setCache(prev => ({ ...prev, [hat]: '_Failed to load. Try again._' }))
     } finally {
-      setLoading(null)
+      setLoadingHats(prev => {
+        const next = new Set(prev)
+        next.delete(hat)
+        return next
+      })
     }
   }
 
   function selectHat(hat: Hat) {
     setActiveHat(hat)
     setLastDifficulty(null)
-    if (!cache[hat]) {
+    contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+    if (!cache[hat] && !loadingHats.has(hat)) {
+      generateContent(hat, null)
+    }
+  }
+
+  function handleHatHover(hat: Hat) {
+    if (!cache[hat] && !loadingHats.has(hat)) {
       generateContent(hat, null)
     }
   }
@@ -90,7 +119,7 @@ function LearnContent() {
 
   const activeHatMeta = HATS.find(h => h.id === activeHat)!
   const content = cache[activeHat]
-  const isLoading = loading === activeHat
+  const isActiveLoading = loadingHats.has(activeHat)
 
   return (
     <div className="flex h-screen flex-col bg-zinc-50">
@@ -113,21 +142,29 @@ function LearnContent() {
       <div className="border-b border-zinc-200 bg-white px-6 py-3 shrink-0">
         <div className="mx-auto max-w-2xl">
           <div className="flex gap-1.5">
-            {HATS.map(h => (
-              <button
-                key={h.id}
-                onClick={() => selectHat(h.id)}
-                disabled={loading !== null}
-                className={`flex flex-1 flex-col items-center rounded-lg border px-1 py-1.5 text-center transition-colors disabled:opacity-60 ${
-                  activeHat === h.id
-                    ? h.activeClass
-                    : 'border-zinc-200 text-zinc-500 hover:border-zinc-400 hover:bg-zinc-50'
-                } ${loading === h.id ? 'animate-pulse' : ''}`}
-              >
-                <span className="text-xs font-semibold leading-none">{h.label}</span>
-                <span className="text-[10px] leading-none opacity-70">{h.description}</span>
-              </button>
-            ))}
+            {HATS.map(h => {
+              const isLoading = loadingHats.has(h.id)
+              const isCached = !!cache[h.id]
+              return (
+                <button
+                  key={h.id}
+                  onClick={() => selectHat(h.id)}
+                  onMouseEnter={() => handleHatHover(h.id)}
+                  className={`flex flex-1 flex-col items-center rounded-lg border px-1 py-1.5 text-center transition-colors ${
+                    activeHat === h.id
+                      ? h.activeClass
+                      : isCached
+                      ? 'border-zinc-300 text-zinc-600 hover:border-zinc-400 hover:bg-zinc-50'
+                      : 'border-zinc-200 text-zinc-400 hover:border-zinc-300 hover:bg-zinc-50'
+                  } ${isLoading && activeHat !== h.id ? 'opacity-70' : ''}`}
+                >
+                  <span className="text-xs font-semibold leading-none">{h.label}</span>
+                  <span className="text-[10px] leading-none opacity-70">
+                    {isLoading && activeHat !== h.id ? '…' : h.description}
+                  </span>
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>
@@ -137,15 +174,18 @@ function LearnContent() {
         ref={contentRef}
         className="mx-auto w-full max-w-2xl flex-1 overflow-y-auto px-6 py-6"
       >
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-16 gap-3">
-            <div className="text-sm text-zinc-400">
-              Generating {activeHatMeta.label} Hat perspective…
-            </div>
-          </div>
-        ) : content ? (
+        {content ? (
           <div className="prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-headings:my-3">
             <ReactMarkdown>{content}</ReactMarkdown>
+            {isActiveLoading && (
+              <span className="inline-block h-3 w-0.5 animate-pulse bg-zinc-400 ml-0.5" />
+            )}
+          </div>
+        ) : isActiveLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <span className="text-sm text-zinc-400">
+              Generating {activeHatMeta.label} Hat perspective…
+            </span>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-16 gap-4">
@@ -163,13 +203,14 @@ function LearnContent() {
       </main>
 
       {/* Difficulty + footer */}
-      {content && !isLoading && (
+      {(content || isActiveLoading) && (
         <div className="border-t border-zinc-100 bg-white px-6 py-3 shrink-0">
           <div className="mx-auto max-w-2xl flex items-center justify-between gap-4">
             <div className="flex gap-2">
               <button
                 onClick={() => applyDifficulty('easier')}
-                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+                disabled={isActiveLoading}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-40 ${
                   lastDifficulty === 'easier'
                     ? 'border-zinc-900 bg-zinc-900 text-white'
                     : 'border-zinc-200 text-zinc-600 hover:border-zinc-400'
@@ -179,7 +220,8 @@ function LearnContent() {
               </button>
               <button
                 onClick={() => applyDifficulty('deeper')}
-                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+                disabled={isActiveLoading}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-40 ${
                   lastDifficulty === 'deeper'
                     ? 'border-zinc-900 bg-zinc-900 text-white'
                     : 'border-zinc-200 text-zinc-600 hover:border-zinc-400'

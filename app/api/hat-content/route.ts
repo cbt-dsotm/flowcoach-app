@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
-import { createServiceClient } from '@/lib/supabase'
 import { createAuthClient } from '@/lib/supabase-server'
 import { buildHatContentPrompt, Hat } from '@/lib/prompts'
 
@@ -28,13 +27,26 @@ export async function POST(req: NextRequest) {
     difficulty_instruction ?? null
   )
 
-  const response = await anthropic.messages.create({
+  const stream = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 1024,
     messages: [{ role: 'user', content: prompt }],
+    stream: true,
   })
 
-  const content = response.content[0].type === 'text' ? response.content[0].text : ''
+  const encoder = new TextEncoder()
 
-  return NextResponse.json({ content })
+  return new Response(
+    new ReadableStream({
+      async start(controller) {
+        for await (const chunk of stream) {
+          if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+            controller.enqueue(encoder.encode(chunk.delta.text))
+          }
+        }
+        controller.close()
+      },
+    }),
+    { headers: { 'Content-Type': 'text/plain; charset=utf-8' } }
+  )
 }
