@@ -34,7 +34,7 @@ export default function Login() {
         setLoading(false)
         return
       }
-      router.push('/goal')
+      router.push('/dashboard')
     }
   }
 

@@ -114,8 +114,8 @@ export default function Goal() {
 
       <footer className="border-t border-zinc-200 bg-white px-6 py-4">
         <div className="mx-auto flex max-w-lg items-center justify-between">
-          <Link href="/onboarding" className="text-sm text-zinc-400 hover:text-zinc-600">
-            Back
+          <Link href="/dashboard" className="text-sm text-zinc-400 hover:text-zinc-600">
+            ← Dashboard
           </Link>
           <button
             onClick={startSprint}

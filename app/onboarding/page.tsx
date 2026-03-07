@@ -111,7 +111,7 @@ export default function Onboarding() {
       // Non-blocking — navigate anyway
     } finally {
       setSaving(false)
-      router.push('/goal')
+      router.push('/dashboard')
     }
   }
 
