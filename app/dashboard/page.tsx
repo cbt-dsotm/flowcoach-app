@@ -60,15 +60,21 @@ const LEARNING_MODES = [
 
 const TOTAL_SECTIONS = 7
 
-const TIER_LABELS: Record<number, { label: string; tagline: string }> = {
-  0: { label: 'Basic', tagline: 'Generic coaching — same for everyone' },
-  1: { label: 'Good', tagline: 'Claude knows your goal and background' },
-  2: { label: 'Good', tagline: 'Claude knows your goal and background' },
-  3: { label: 'Great', tagline: 'Claude skips what you know, fills actual gaps' },
-  4: { label: 'Great', tagline: 'Claude skips what you know, fills actual gaps' },
-  5: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn' },
-  6: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn' },
-  7: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn' },
+const TIER_LABELS: Record<number, { label: string; tagline: string; pillClass: string }> = {
+  0: { label: 'Basic',       tagline: 'Generic coaching — same for everyone',                    pillClass: 'bg-zinc-100 text-zinc-600' },
+  1: { label: 'Good',        tagline: 'Claude knows your goal and background',                   pillClass: 'bg-blue-100 text-blue-700' },
+  2: { label: 'Good',        tagline: 'Claude knows your goal and background',                   pillClass: 'bg-blue-100 text-blue-700' },
+  3: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',           pillClass: 'bg-indigo-100 text-indigo-700' },
+  4: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',           pillClass: 'bg-indigo-100 text-indigo-700' },
+  5: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn',  pillClass: 'bg-emerald-100 text-emerald-700' },
+  6: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn',  pillClass: 'bg-emerald-100 text-emerald-700' },
+  7: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn',  pillClass: 'bg-emerald-100 text-emerald-700' },
+}
+
+interface LastGoal {
+  topic: string
+  win_condition: string | null
+  confidence: number | null
 }
 
 export default function Dashboard() {
@@ -76,22 +82,21 @@ export default function Dashboard() {
   const [email, setEmail] = useState<string | null>(null)
   const [signingOut, setSigningOut] = useState(false)
   const [sectionsComplete, setSectionsComplete] = useState<number | null>(null)
+  const [lastGoal, setLastGoal] = useState<LastGoal | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
       setEmail(user.email ?? null)
-      supabase
-        .from('profiles')
-        .select('profile_data')
-        .eq('user_id', user.id)
-        .single()
-        .then(({ data }) => {
-          const pd = (data?.profile_data as Record<string, string | null>) ?? {}
-          const count = Object.values(pd).filter(Boolean).length
-          setSectionsComplete(count)
-        })
+      Promise.all([
+        supabase.from('profiles').select('profile_data').eq('user_id', user.id).single(),
+        supabase.from('goals').select('topic, win_condition, confidence').eq('user_id', user.id).single(),
+      ]).then(([{ data: profile }, { data: goal }]) => {
+        const pd = (profile?.profile_data as Record<string, string | null>) ?? {}
+        setSectionsComplete(Object.values(pd).filter(Boolean).length)
+        if (goal?.topic) setLastGoal(goal as LastGoal)
+      })
     })
   }, [])
 
@@ -176,8 +181,37 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Status strip */}
+        <div className="mb-3 mt-4 flex items-center justify-between gap-4 rounded-xl border border-zinc-100 bg-white px-5 py-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${tier.pillClass}`}>
+              {tier.label}
+            </span>
+            <span className="truncate text-xs text-zinc-400">{tier.tagline}</span>
+          </div>
+          <div className="flex shrink-0 items-center gap-4">
+            {lastGoal ? (
+              <Link
+                href={`/learn?topic=${encodeURIComponent(lastGoal.topic)}${lastGoal.win_condition ? `&win=${encodeURIComponent(lastGoal.win_condition)}` : ''}${lastGoal.confidence ? `&confidence=${lastGoal.confidence}` : ''}`}
+                className="text-xs font-medium text-zinc-700 hover:text-zinc-900 truncate max-w-[140px]"
+                title={lastGoal.topic}
+              >
+                Continue: {lastGoal.topic} →
+              </Link>
+            ) : (
+              <span className="text-xs text-zinc-300">No topic yet</span>
+            )}
+            <span className="text-xs text-zinc-300 cursor-default select-none">
+              Pick a topic
+              <span className="ml-1 rounded-full bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-400">
+                soon
+              </span>
+            </span>
+          </div>
+        </div>
+
         {/* Learning modes */}
-        <div className="mt-6">
+        <div className="mt-2">
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
             Step 2 — Start learning
           </p>
