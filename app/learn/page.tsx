@@ -11,12 +11,12 @@ const LEVEL_MIN = -4
 const LEVEL_MAX = 4
 
 const HATS: { id: Hat; label: string; description: string; activeClass: string; inactiveClass: string }[] = [
-  { id: 'white',  label: 'White',  description: 'Facts',    activeClass: 'border-2 border-black bg-zinc-900 text-white',           inactiveClass: 'border border-zinc-300 bg-zinc-100 text-zinc-700 hover:bg-zinc-200' },
-  { id: 'yellow', label: 'Yellow', description: 'Benefits', activeClass: 'border-2 border-black bg-yellow-400 text-yellow-900',    inactiveClass: 'border border-yellow-300 bg-yellow-50 text-yellow-800 hover:bg-yellow-100' },
-  { id: 'black',  label: 'Black',  description: 'Risks',    activeClass: 'border-2 border-black bg-zinc-800 text-zinc-100',        inactiveClass: 'border border-zinc-400 bg-zinc-200 text-zinc-700 hover:bg-zinc-300' },
-  { id: 'red',    label: 'Red',    description: 'Feelings', activeClass: 'border-2 border-black bg-red-500 text-white',            inactiveClass: 'border border-red-200 bg-red-50 text-red-700 hover:bg-red-100' },
-  { id: 'green',  label: 'Green',  description: 'Ideas',    activeClass: 'border-2 border-black bg-green-500 text-white',          inactiveClass: 'border border-green-200 bg-green-50 text-green-700 hover:bg-green-100' },
-  { id: 'blue',   label: 'Blue',   description: 'Process',  activeClass: 'border-2 border-black bg-blue-500 text-white',           inactiveClass: 'border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100' },
+  { id: 'white',  label: 'White',  description: 'Facts',    activeClass: 'border-2 border-zinc-800 bg-white text-zinc-900',        inactiveClass: 'border border-zinc-300 bg-zinc-100 text-zinc-700 hover:bg-zinc-200' },
+  { id: 'yellow', label: 'Yellow', description: 'Benefits', activeClass: 'border border-yellow-500 bg-yellow-400 text-yellow-900', inactiveClass: 'border border-yellow-300 bg-yellow-50 text-yellow-800 hover:bg-yellow-100' },
+  { id: 'black',  label: 'Black',  description: 'Risks',    activeClass: 'border-2 border-zinc-900 bg-zinc-700 text-zinc-100',     inactiveClass: 'border border-zinc-400 bg-zinc-200 text-zinc-700 hover:bg-zinc-300' },
+  { id: 'red',    label: 'Red',    description: 'Feelings', activeClass: 'border border-red-600 bg-red-500 text-white',            inactiveClass: 'border border-red-200 bg-red-50 text-red-700 hover:bg-red-100' },
+  { id: 'green',  label: 'Green',  description: 'Ideas',    activeClass: 'border border-green-600 bg-green-500 text-white',        inactiveClass: 'border border-green-200 bg-green-50 text-green-700 hover:bg-green-100' },
+  { id: 'blue',   label: 'Blue',   description: 'Process',  activeClass: 'border border-blue-600 bg-blue-500 text-white',          inactiveClass: 'border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100' },
 ]
 
 const HAT_DESCRIPTIONS: Record<Hat, string> = {
