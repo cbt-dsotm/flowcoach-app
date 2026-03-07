@@ -145,9 +145,9 @@ export default function Sprint() {
               }`}
             >
               {msg.role === 'assistant' ? (
-                <ReactMarkdown className="prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:my-2">
-                  {msg.content}
-                </ReactMarkdown>
+                <div className="prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:my-2">
+                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                </div>
               ) : (
                 <p className="whitespace-pre-wrap">{msg.content}</p>
               )}
