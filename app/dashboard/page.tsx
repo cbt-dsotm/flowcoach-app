@@ -15,12 +15,12 @@ const LEARNING_MODES = [
       "Explore any topic through Edward de Bono's Six Thinking Hats. Switch perspectives mid-session. Stay in Flow.",
     href: '/goal',
     live: true,
-    cardClass:   'border-emerald-500 bg-emerald-500 shadow-sm',
-    nameClass:   'text-white',
-    taglineClass:'text-emerald-50',
-    descClass:   'text-emerald-100',
+    cardClass:   'border-2 border-emerald-400 bg-emerald-50 shadow-sm',
+    nameClass:   'text-emerald-900',
+    taglineClass:'text-emerald-700',
+    descClass:   'text-emerald-600',
     badgeClass:  '',
-    buttonClass: 'bg-white text-emerald-600 hover:bg-emerald-50',
+    buttonClass: 'bg-emerald-600 text-white hover:bg-emerald-700',
   },
   {
     id: 'practice',
@@ -275,9 +275,13 @@ function TopicSelector({ lastGoal }: { lastGoal: LastGoal | null }) {
           {lastGoal.topic}
         </Link>
       ) : (
-        <span className="cursor-default text-sm font-bold text-zinc-400">
-          No topic yet
-        </span>
+        <Link
+          href="/goal"
+          className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm font-medium text-zinc-500 shadow-sm transition-colors hover:border-zinc-300 hover:text-zinc-700"
+        >
+          <span className="text-zinc-300">+</span>
+          Set a topic
+        </Link>
       )}
 
       {open && (
@@ -393,17 +397,15 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Right: profile status — no card, just info + link */}
-            <div className="flex shrink-0 flex-col items-end gap-1">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-zinc-600">Your Profile</span>
-                {profileLoaded && (
-                  <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold text-zinc-500">
-                    {completed === 0 ? 'Not started' : `${completed} of ${TOTAL_SECTIONS}`}
-                  </span>
-                )}
-              </div>
-              <p className="max-w-[180px] text-right text-[11px] leading-snug text-zinc-400">
+            {/* Right: profile button — pill/capsule */}
+            <Link
+              href="/profile"
+              className="flex shrink-0 flex-col items-center rounded-3xl bg-violet-600 px-6 py-3 text-center shadow-sm transition-all hover:bg-violet-700 hover:shadow-md"
+            >
+              <span className="text-sm font-bold text-white">
+                {completed === 0 ? 'Build Your Profile' : completed < 7 ? 'Continue Profile' : 'Your Profile'}
+              </span>
+              <span className="mt-0.5 text-[11px] text-violet-200">
                 {completed === 0
                   ? '5 min → unlocks Seeker coaching'
                   : completed < 3
@@ -411,14 +413,13 @@ export default function Dashboard() {
                   : completed < 5
                   ? `${5 - completed} more section${5 - completed === 1 ? '' : 's'} → Cartographer`
                   : 'Fully fitted coaching'}
-              </p>
-              <Link
-                href="/profile"
-                className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
-              >
-                {completed === 0 ? 'Build your profile →' : completed < 7 ? 'Continue →' : 'View profile →'}
-              </Link>
-            </div>
+              </span>
+              {profileLoaded && completed > 0 && completed < 7 && (
+                <span className="mt-0.5 text-[10px] text-violet-300">
+                  {completed} of {TOTAL_SECTIONS} sections
+                </span>
+              )}
+            </Link>
           </div>
           <div className="mt-5 border-b border-zinc-200" />
         </div>
