@@ -6,7 +6,7 @@ import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 
 type Hat = 'white' | 'yellow' | 'black' | 'red' | 'green' | 'blue'
-type Difficulty = 'Too easy' | 'Just right' | 'Too hard'
+type Difficulty = 'easier' | 'deeper'
 
 const HATS: { id: Hat; label: string; description: string; activeClass: string }[] = [
   { id: 'white',  label: 'White',  description: 'Facts',     activeClass: 'border-zinc-900 bg-zinc-900 text-white' },
@@ -36,7 +36,7 @@ function LearnContent() {
   const [activeHat, setActiveHat] = useState<Hat>('white')
   const [cache, setCache] = useState<Partial<Record<Hat, string>>>({})
   const [loading, setLoading] = useState<Hat | null>(null)
-  const [difficulty, setDifficulty] = useState<Difficulty>('Just right')
+  const [lastDifficulty, setLastDifficulty] = useState<Difficulty | null>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
   // Auto-generate white hat on mount
@@ -73,19 +73,17 @@ function LearnContent() {
 
   function selectHat(hat: Hat) {
     setActiveHat(hat)
-    setDifficulty('Just right')
+    setLastDifficulty(null)
     if (!cache[hat]) {
       generateContent(hat, null)
     }
   }
 
   function applyDifficulty(d: Difficulty) {
-    setDifficulty(d)
-    if (d === 'Just right') return
-    const instruction = d === 'Too easy'
-      ? 'Go deeper: increase specificity, add nuance, assume stronger prior knowledge'
-      : 'Simplify: reduce scope, use more basic examples, assume less prior knowledge'
-    // Clear cache for this hat and regenerate
+    setLastDifficulty(d)
+    const instruction = d === 'easier'
+      ? 'Simplify: reduce scope, use more basic examples, assume less prior knowledge'
+      : 'Go deeper: increase specificity, add nuance, assume stronger prior knowledge'
     setCache(prev => ({ ...prev, [activeHat]: undefined }))
     generateContent(activeHat, instruction)
   }
@@ -168,23 +166,27 @@ function LearnContent() {
       {content && !isLoading && (
         <div className="border-t border-zinc-100 bg-white px-6 py-3 shrink-0">
           <div className="mx-auto max-w-2xl flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-zinc-400 shrink-0">How does this feel?</span>
-              <div className="flex gap-1.5">
-                {(['Too easy', 'Just right', 'Too hard'] as Difficulty[]).map(d => (
-                  <button
-                    key={d}
-                    onClick={() => applyDifficulty(d)}
-                    className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                      difficulty === d
-                        ? 'border-zinc-900 bg-zinc-900 text-white'
-                        : 'border-zinc-200 text-zinc-600 hover:border-zinc-400'
-                    }`}
-                  >
-                    {d}
-                  </button>
-                ))}
-              </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => applyDifficulty('easier')}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+                  lastDifficulty === 'easier'
+                    ? 'border-zinc-900 bg-zinc-900 text-white'
+                    : 'border-zinc-200 text-zinc-600 hover:border-zinc-400'
+                }`}
+              >
+                Make this easier
+              </button>
+              <button
+                onClick={() => applyDifficulty('deeper')}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+                  lastDifficulty === 'deeper'
+                    ? 'border-zinc-900 bg-zinc-900 text-white'
+                    : 'border-zinc-200 text-zinc-600 hover:border-zinc-400'
+                }`}
+              >
+                Let's go deeper
+              </button>
             </div>
             <Link
               href="/dashboard"
