@@ -10,13 +10,13 @@ type Hat = 'white' | 'yellow' | 'black' | 'red' | 'green' | 'blue'
 const LEVEL_MIN = -4
 const LEVEL_MAX = 4
 
-const HATS: { id: Hat; label: string; description: string; activeClass: string }[] = [
-  { id: 'white',  label: 'White',  description: 'Facts',    activeClass: 'border-zinc-900 bg-zinc-900 text-white' },
-  { id: 'yellow', label: 'Yellow', description: 'Benefits', activeClass: 'border-yellow-500 bg-yellow-400 text-yellow-900' },
-  { id: 'black',  label: 'Black',  description: 'Risks',    activeClass: 'border-zinc-800 bg-zinc-800 text-zinc-100' },
-  { id: 'red',    label: 'Red',    description: 'Feelings', activeClass: 'border-red-500 bg-red-500 text-white' },
-  { id: 'green',  label: 'Green',  description: 'Ideas',    activeClass: 'border-green-500 bg-green-500 text-white' },
-  { id: 'blue',   label: 'Blue',   description: 'Process',  activeClass: 'border-blue-500 bg-blue-500 text-white' },
+const HATS: { id: Hat; label: string; description: string; activeClass: string; inactiveClass: string }[] = [
+  { id: 'white',  label: 'White',  description: 'Facts',    activeClass: 'border-2 border-black bg-zinc-900 text-white',           inactiveClass: 'border border-zinc-300 bg-zinc-100 text-zinc-700 hover:bg-zinc-200' },
+  { id: 'yellow', label: 'Yellow', description: 'Benefits', activeClass: 'border-2 border-black bg-yellow-400 text-yellow-900',    inactiveClass: 'border border-yellow-300 bg-yellow-50 text-yellow-800 hover:bg-yellow-100' },
+  { id: 'black',  label: 'Black',  description: 'Risks',    activeClass: 'border-2 border-black bg-zinc-800 text-zinc-100',        inactiveClass: 'border border-zinc-400 bg-zinc-200 text-zinc-700 hover:bg-zinc-300' },
+  { id: 'red',    label: 'Red',    description: 'Feelings', activeClass: 'border-2 border-black bg-red-500 text-white',            inactiveClass: 'border border-red-200 bg-red-50 text-red-700 hover:bg-red-100' },
+  { id: 'green',  label: 'Green',  description: 'Ideas',    activeClass: 'border-2 border-black bg-green-500 text-white',          inactiveClass: 'border border-green-200 bg-green-50 text-green-700 hover:bg-green-100' },
+  { id: 'blue',   label: 'Blue',   description: 'Process',  activeClass: 'border-2 border-black bg-blue-500 text-white',           inactiveClass: 'border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100' },
 ]
 
 const HAT_DESCRIPTIONS: Record<Hat, string> = {
@@ -153,12 +153,8 @@ function LearnContent() {
               <button
                 key={h.id}
                 onClick={() => selectHat(h.id)}
-                className={`flex flex-1 flex-col items-center rounded-lg border px-1 py-1.5 text-center transition-colors ${
-                  activeHat === h.id
-                    ? h.activeClass
-                    : cache[cacheKey(h.id, hatLevels[h.id] ?? 0)]
-                    ? 'border-zinc-300 text-zinc-600 hover:border-zinc-400 hover:bg-zinc-50'
-                    : 'border-zinc-200 text-zinc-400 hover:border-zinc-300 hover:bg-zinc-50'
+                className={`flex flex-1 flex-col items-center rounded-lg px-1 py-1.5 text-center transition-colors ${
+                  activeHat === h.id ? h.activeClass : h.inactiveClass
                 }`}
               >
                 <span className="text-xs font-semibold leading-none">{h.label}</span>
@@ -206,32 +202,32 @@ function LearnContent() {
       {(content || isStreaming) && (
         <div className="border-t border-zinc-100 bg-white px-6 py-3 shrink-0">
           <div className="mx-auto max-w-2xl flex items-center justify-between gap-4">
-            <div className="flex gap-2">
-              <button
-                onClick={() => changeLevel('easier')}
-                disabled={isStreaming || activeLevel <= LEVEL_MIN}
-                className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:border-zinc-400 disabled:opacity-30"
-              >
-                Make this easier
-              </button>
-              <button
-                onClick={() => changeLevel('deeper')}
-                disabled={isStreaming || activeLevel >= LEVEL_MAX}
-                className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:border-zinc-400 disabled:opacity-30"
-              >
-                Let's go deeper
-              </button>
-            </div>
-            <div className="flex items-center gap-3">
+            <button
+              onClick={() => changeLevel('easier')}
+              disabled={isStreaming || activeLevel <= LEVEL_MIN}
+              className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:border-zinc-400 disabled:opacity-30"
+            >
+              Make this easier
+            </button>
+            <div className="flex-1 flex items-center justify-center min-w-[4rem]">
               {activeLevel !== 0 && (
                 <span className="text-[10px] text-zinc-400">
-                  {activeLevel < 0 ? `${Math.abs(activeLevel)} simpler` : `${activeLevel} deeper`}
+                  {activeLevel < 0 ? `${Math.abs(activeLevel)} easier` : `${activeLevel} deeper`}
                 </span>
               )}
-              <Link href="/dashboard" className="text-xs font-medium text-zinc-500 hover:text-zinc-800">
-                Done →
-              </Link>
             </div>
+            <button
+              onClick={() => changeLevel('deeper')}
+              disabled={isStreaming || activeLevel >= LEVEL_MAX}
+              className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:border-zinc-400 disabled:opacity-30"
+            >
+              Let's go deeper
+            </button>
+          </div>
+          <div className="mx-auto max-w-2xl flex justify-end mt-1">
+            <Link href="/dashboard" className="text-xs font-medium text-zinc-500 hover:text-zinc-800">
+              Done →
+            </Link>
           </div>
         </div>
       )}
