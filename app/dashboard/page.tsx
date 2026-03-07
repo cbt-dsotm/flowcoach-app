@@ -15,12 +15,12 @@ const LEARNING_MODES = [
       "Explore any topic through Edward de Bono's Six Thinking Hats. Switch perspectives mid-session. Stay in Flow.",
     href: '/goal',
     live: true,
-    cardClass:   'border-emerald-700 bg-emerald-600 shadow-sm',
+    cardClass:   'border-emerald-500 bg-emerald-500 shadow-sm',
     nameClass:   'text-white',
-    taglineClass:'text-emerald-100',
-    descClass:   'text-emerald-200',
+    taglineClass:'text-emerald-50',
+    descClass:   'text-emerald-100',
     badgeClass:  '',
-    buttonClass: 'bg-white text-emerald-700 hover:bg-emerald-50',
+    buttonClass: 'bg-white text-emerald-600 hover:bg-emerald-50',
   },
   {
     id: 'practice',
@@ -90,15 +90,15 @@ const LEARNING_MODES = [
 
 const TOTAL_SECTIONS = 7
 
-const TIER_LABELS: Record<number, { label: string; tagline: string; pillClass: string; accentBorder: string }> = {
-  0: { label: 'Basic',       tagline: 'Generic coaching — same for everyone',                   pillClass: 'bg-zinc-100 text-zinc-600',      accentBorder: 'border-l-zinc-300' },
-  1: { label: 'Good',        tagline: 'Claude knows your goal and background',                  pillClass: 'bg-blue-100 text-blue-700',       accentBorder: 'border-l-blue-400' },
-  2: { label: 'Good',        tagline: 'Claude knows your goal and background',                  pillClass: 'bg-blue-100 text-blue-700',       accentBorder: 'border-l-blue-400' },
-  3: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',          pillClass: 'bg-indigo-100 text-indigo-700',   accentBorder: 'border-l-indigo-400' },
-  4: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',          pillClass: 'bg-indigo-100 text-indigo-700',   accentBorder: 'border-l-indigo-400' },
-  5: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-100 text-emerald-700', accentBorder: 'border-l-emerald-400' },
-  6: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-100 text-emerald-700', accentBorder: 'border-l-emerald-400' },
-  7: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-100 text-emerald-700', accentBorder: 'border-l-emerald-400' },
+const TIER_LABELS: Record<number, { label: string; tagline: string; pillClass: string; topAccent: string }> = {
+  0: { label: 'Basic',       tagline: 'Generic coaching — same for everyone',                   pillClass: 'bg-zinc-700 text-zinc-300',      topAccent: 'border-t-zinc-500' },
+  1: { label: 'Good',        tagline: 'Claude knows your goal and background',                  pillClass: 'bg-blue-900 text-blue-300',       topAccent: 'border-t-blue-500' },
+  2: { label: 'Good',        tagline: 'Claude knows your goal and background',                  pillClass: 'bg-blue-900 text-blue-300',       topAccent: 'border-t-blue-500' },
+  3: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',          pillClass: 'bg-indigo-900 text-indigo-300',   topAccent: 'border-t-indigo-500' },
+  4: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',          pillClass: 'bg-indigo-900 text-indigo-300',   topAccent: 'border-t-indigo-500' },
+  5: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-900 text-emerald-300', topAccent: 'border-t-emerald-500' },
+  6: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-900 text-emerald-300', topAccent: 'border-t-emerald-500' },
+  7: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-900 text-emerald-300', topAccent: 'border-t-emerald-500' },
 }
 
 interface LastGoal {
@@ -201,30 +201,32 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* Coaching status — badge + tier + topic actions */}
-        <div className={`mb-4 rounded-xl border border-zinc-100 border-l-4 bg-stone-50 px-5 py-4 ${tier.accentBorder}`}>
+        {/* Coaching status — dark band, full-bleed, no card */}
+        <div className={`-mx-6 mb-6 border-t-2 border-b border-b-zinc-800 bg-zinc-900 px-6 py-4 ${tier.topAccent}`}>
           <div className="flex items-center gap-4">
             <TierBadge label={tier.label} />
             <div className="flex flex-1 min-w-0 items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-sm font-bold text-zinc-900">{tier.label} coaching</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-bold text-white">{tier.label} coaching</p>
+                </div>
                 <p className="text-xs text-zinc-400">{tier.tagline}</p>
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1.5">
                 {lastGoal ? (
                   <Link
                     href={`/learn?topic=${encodeURIComponent(lastGoal.topic)}${lastGoal.win_condition ? `&win=${encodeURIComponent(lastGoal.win_condition)}` : ''}${lastGoal.confidence ? `&confidence=${lastGoal.confidence}` : ''}`}
-                    className="text-xs font-medium text-zinc-700 hover:text-zinc-900 max-w-[160px] truncate text-right"
+                    className="max-w-[160px] truncate text-right text-xs font-medium text-zinc-200 hover:text-white"
                     title={lastGoal.topic}
                   >
                     Continue: {lastGoal.topic} →
                   </Link>
                 ) : (
-                  <span className="text-xs text-zinc-300">No topic yet</span>
+                  <span className="text-xs text-zinc-500">No topic yet</span>
                 )}
-                <span className="cursor-default select-none text-xs text-zinc-300">
+                <span className="cursor-default select-none text-xs text-zinc-500">
                   Pick a topic{' '}
-                  <span className="rounded-full bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-400">
+                  <span className="rounded-full bg-zinc-800 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-500">
                     🚧 soon
                   </span>
                 </span>
