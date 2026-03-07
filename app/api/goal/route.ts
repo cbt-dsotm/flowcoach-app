@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase'
 
 export async function POST(req: NextRequest) {
-  const sessionId = req.cookies.get('session_id')?.value
+  let sessionId = req.cookies.get('session_id')?.value
+  let setCookie = false
 
   if (!sessionId) {
-    return NextResponse.json({ error: 'No session ID' }, { status: 400 })
+    sessionId = crypto.randomUUID()
+    setCookie = true
   }
 
   const { topic, win_condition, confidence } = await req.json()
@@ -29,5 +31,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to save goal' }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true })
+  const response = NextResponse.json({ ok: true })
+  if (setCookie) {
+    response.cookies.set('session_id', sessionId, { path: '/', maxAge: 86400 })
+  }
+  return response
 }
