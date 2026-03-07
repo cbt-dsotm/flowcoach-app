@@ -32,7 +32,10 @@ export default function Goal() {
       // Non-blocking — navigate anyway
     } finally {
       setSaving(false)
-      router.push('/sprint')
+      const params = new URLSearchParams({ topic: topic.trim() })
+      if (winCondition.trim()) params.set('win', winCondition.trim())
+      if (confidence) params.set('confidence', String(confidence))
+      router.push(`/learn?${params.toString()}`)
     }
   }
 
