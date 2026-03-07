@@ -63,11 +63,11 @@ const LEARNING_MODES = [
       'Cards generated from your learning sessions, scheduled when your brain is ready to consolidate.',
     href: null,
     live: false,
-    cardClass:   'border-orange-200 bg-orange-50',
-    nameClass:   'text-orange-900',
-    taglineClass:'text-orange-700',
-    descClass:   'text-orange-600',
-    badgeClass:  'bg-orange-100 text-orange-700',
+    cardClass:   'border-rose-200 bg-rose-50',
+    nameClass:   'text-rose-900',
+    taglineClass:'text-rose-700',
+    descClass:   'text-rose-600',
+    badgeClass:  'bg-rose-100 text-rose-700',
     buttonClass: '',
   },
   {
@@ -79,26 +79,26 @@ const LEARNING_MODES = [
       'Find exactly where you are and what to tackle next. No generic tests — calibrated to your level.',
     href: null,
     live: false,
-    cardClass:   'border-violet-200 bg-violet-50',
-    nameClass:   'text-violet-900',
-    taglineClass:'text-violet-700',
-    descClass:   'text-violet-600',
-    badgeClass:  'bg-violet-100 text-violet-700',
+    cardClass:   'border-fuchsia-200 bg-fuchsia-50',
+    nameClass:   'text-fuchsia-900',
+    taglineClass:'text-fuchsia-700',
+    descClass:   'text-fuchsia-600',
+    badgeClass:  'bg-fuchsia-100 text-fuchsia-700',
     buttonClass: '',
   },
 ]
 
 const TOTAL_SECTIONS = 7
 
-const TIER_LABELS: Record<number, { label: string; tagline: string; pillClass: string; topAccent: string }> = {
-  0: { label: 'Basic',       tagline: 'Generic coaching — same for everyone',                   pillClass: 'bg-zinc-700 text-zinc-300',      topAccent: 'border-t-zinc-500' },
-  1: { label: 'Good',        tagline: 'Claude knows your goal and background',                  pillClass: 'bg-blue-900 text-blue-300',       topAccent: 'border-t-blue-500' },
-  2: { label: 'Good',        tagline: 'Claude knows your goal and background',                  pillClass: 'bg-blue-900 text-blue-300',       topAccent: 'border-t-blue-500' },
-  3: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',          pillClass: 'bg-indigo-900 text-indigo-300',   topAccent: 'border-t-indigo-500' },
-  4: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',          pillClass: 'bg-indigo-900 text-indigo-300',   topAccent: 'border-t-indigo-500' },
-  5: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-900 text-emerald-300', topAccent: 'border-t-emerald-500' },
-  6: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-900 text-emerald-300', topAccent: 'border-t-emerald-500' },
-  7: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-900 text-emerald-300', topAccent: 'border-t-emerald-500' },
+const TIER_LABELS: Record<number, { label: string; tagline: string; pillClass: string; topAccent: string; bandBg: string }> = {
+  0: { label: 'Basic',       tagline: 'Generic coaching — same for everyone',                   pillClass: 'bg-zinc-600 text-zinc-200',      topAccent: 'border-t-zinc-400',    bandBg: 'bg-zinc-800' },
+  1: { label: 'Good',        tagline: 'Claude knows your goal and background',                  pillClass: 'bg-blue-900 text-blue-300',       topAccent: 'border-t-blue-400',    bandBg: 'bg-blue-950' },
+  2: { label: 'Good',        tagline: 'Claude knows your goal and background',                  pillClass: 'bg-blue-900 text-blue-300',       topAccent: 'border-t-blue-400',    bandBg: 'bg-blue-950' },
+  3: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',          pillClass: 'bg-indigo-900 text-indigo-300',   topAccent: 'border-t-indigo-400',  bandBg: 'bg-indigo-950' },
+  4: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',          pillClass: 'bg-indigo-900 text-indigo-300',   topAccent: 'border-t-indigo-400',  bandBg: 'bg-indigo-950' },
+  5: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-900 text-emerald-300', topAccent: 'border-t-emerald-400', bandBg: 'bg-emerald-950' },
+  6: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-900 text-emerald-300', topAccent: 'border-t-emerald-400', bandBg: 'bg-emerald-950' },
+  7: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-900 text-emerald-300', topAccent: 'border-t-emerald-400', bandBg: 'bg-emerald-950' },
 }
 
 interface LastGoal {
@@ -110,9 +110,9 @@ interface LastGoal {
 function TierBadge({ label }: { label: string }) {
   if (label === 'Basic') return (
     <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="24" cy="24" r="21" stroke="#d1d5db" strokeWidth="2.5"/>
-      <circle cx="24" cy="24" r="13" stroke="#d1d5db" strokeWidth="1.5" strokeDasharray="3 2"/>
-      <circle cx="24" cy="24" r="4" fill="#9ca3af"/>
+      <circle cx="24" cy="24" r="21" stroke="#e4e4e7" strokeWidth="2.5"/>
+      <circle cx="24" cy="24" r="13" stroke="#e4e4e7" strokeWidth="1.5" strokeDasharray="3 2"/>
+      <circle cx="24" cy="24" r="4" fill="#d4d4d8"/>
     </svg>
   )
   if (label === 'Good') return (
@@ -178,7 +178,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-zinc-50">
       <header className="border-b border-zinc-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-2xl items-center justify-between">
+        <div className="mx-auto flex max-w-3xl items-center justify-between">
           <span className="text-sm font-bold text-zinc-900">FlowCoach</span>
           <div className="flex items-center gap-4">
             {email && <span className="text-xs text-zinc-400">{email}</span>}
@@ -193,7 +193,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-6 py-10">
+      <main className="mx-auto max-w-3xl px-6 py-10">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-zinc-900">Welcome back.</h1>
           <p className="mt-1 text-sm text-zinc-500">
@@ -202,7 +202,7 @@ export default function Dashboard() {
         </div>
 
         {/* Coaching status — dark band, full-bleed, no card */}
-        <div className={`-mx-6 mb-6 border-t-2 border-b border-b-zinc-800 bg-zinc-900 px-6 py-4 ${tier.topAccent}`}>
+        <div className={`-mx-6 mb-6 border-t-2 border-b border-b-white/10 px-6 py-4 ${tier.topAccent} ${tier.bandBg}`}>
           <div className="flex items-center gap-4">
             <TierBadge label={tier.label} />
             <div className="flex flex-1 min-w-0 items-start justify-between gap-3">
@@ -237,10 +237,10 @@ export default function Dashboard() {
 
         {/* Profile — featured card */}
         <div className="mb-4">
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+          <p className="mb-2 border-l-2 border-zinc-300 pl-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
             Step 1 — Build your profile
           </p>
-          <div className="rounded-xl border-2 border-indigo-200 bg-indigo-50 px-5 py-4">
+          <div className="rounded-xl border-2 border-indigo-300 bg-indigo-100 px-5 py-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
@@ -281,11 +281,12 @@ export default function Dashboard() {
 
         {/* Learning modes */}
         <div className="mt-2">
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+          <p className="mb-2 border-l-2 border-zinc-300 pl-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
             Step 2 — Start learning
           </p>
           <div className="flex flex-col gap-3">
-            {LEARNING_MODES.map((mode) => (
+            {/* Live modes — full width */}
+            {LEARNING_MODES.filter(m => m.live).map((mode) => (
               <div
                 key={mode.id}
                 className={`rounded-xl border px-5 py-4 transition-all ${mode.cardClass}`}
@@ -295,16 +296,11 @@ export default function Dashboard() {
                     <div className="flex items-center gap-2">
                       <span className="text-base">{mode.icon}</span>
                       <span className={`text-sm font-bold ${mode.nameClass}`}>{mode.name}</span>
-                      {!mode.live && (
-                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${mode.badgeClass}`}>
-                          🚧 Coming soon
-                        </span>
-                      )}
                     </div>
-                    <p className={`text-xs font-medium ${mode.taglineClass}`}>{mode.tagline}</p>
+                    <p className={`text-sm font-medium ${mode.taglineClass}`}>{mode.tagline}</p>
                     <p className={`mt-1 text-xs leading-relaxed ${mode.descClass}`}>{mode.description}</p>
                   </div>
-                  {mode.live && mode.href && (
+                  {mode.href && (
                     <Link
                       href={mode.href}
                       className={`shrink-0 rounded-lg px-4 py-2 text-xs font-semibold transition-colors ${mode.buttonClass}`}
@@ -315,6 +311,27 @@ export default function Dashboard() {
                 </div>
               </div>
             ))}
+            {/* Coming soon — 2-column grid */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {LEARNING_MODES.filter(m => !m.live).map((mode) => (
+                <div
+                  key={mode.id}
+                  className={`rounded-xl border px-5 py-4 transition-all ${mode.cardClass}`}
+                >
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">{mode.icon}</span>
+                      <span className={`text-sm font-bold ${mode.nameClass}`}>{mode.name}</span>
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${mode.badgeClass}`}>
+                        🚧 Coming soon
+                      </span>
+                    </div>
+                    <p className={`text-sm font-medium ${mode.taglineClass}`}>{mode.tagline}</p>
+                    <p className={`mt-1 text-xs leading-relaxed ${mode.descClass}`}>{mode.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
