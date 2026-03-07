@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase'
+import { createAuthClient } from '@/lib/supabase-server'
 
 export async function POST(req: NextRequest) {
-  let sessionId = req.cookies.get('session_id')?.value
-  let setCookie = false
+  const authClient = await createAuthClient()
+  const { data: { user } } = await authClient.auth.getUser()
 
-  if (!sessionId) {
-    sessionId = crypto.randomUUID()
-    setCookie = true
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const { topic, win_condition, confidence } = await req.json()
@@ -19,21 +19,17 @@ export async function POST(req: NextRequest) {
   const supabase = createServiceClient()
 
   const { error } = await supabase.from('goals').upsert({
-    session_id: sessionId,
+    user_id: user.id,
     topic,
     win_condition: win_condition ?? null,
     confidence: confidence ?? null,
     updated_at: new Date().toISOString(),
-  }, { onConflict: 'session_id' })
+  }, { onConflict: 'user_id' })
 
   if (error) {
     console.error('Goal save error:', error)
     return NextResponse.json({ error: 'Failed to save goal' }, { status: 500 })
   }
 
-  const response = NextResponse.json({ ok: true })
-  if (setCookie) {
-    response.cookies.set('session_id', sessionId, { path: '/', maxAge: 86400 })
-  }
-  return response
+  return NextResponse.json({ ok: true })
 }

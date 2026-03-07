@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createServiceClient } from '@/lib/supabase'
+import { createAuthClient } from '@/lib/supabase-server'
 import { buildSystemPrompt, Hat } from '@/lib/prompts'
 
 const anthropic = new Anthropic()
@@ -9,19 +10,21 @@ const TURN_LIMIT = 200
 const TURN_WARNING = 175
 
 export async function POST(req: NextRequest) {
-  const sessionId = req.cookies.get('session_id')?.value
+  const authClient = await createAuthClient()
+  const { data: { user } } = await authClient.auth.getUser()
 
-  if (!sessionId) {
-    return NextResponse.json({ error: 'No session ID' }, { status: 400 })
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const userId = user.id
   const supabase = createServiceClient()
 
   // Check turn count
   const { data: session, error: sessionError } = await supabase
     .from('sessions')
     .select('turn_count')
-    .eq('id', sessionId)
+    .eq('user_id', userId)
     .single()
 
   if (sessionError && sessionError.code !== 'PGRST116') {
@@ -45,22 +48,22 @@ export async function POST(req: NextRequest) {
 
   // Ensure session row exists
   await supabase.from('sessions').upsert({
-    id: sessionId,
+    user_id: userId,
     turn_count: turnCount,
     updated_at: new Date().toISOString(),
-  })
+  }, { onConflict: 'user_id' })
 
   // Load profile + goal in parallel
   const [{ data: profile }, { data: goal }] = await Promise.all([
-    supabase.from('profiles').select('*').eq('session_id', sessionId).single(),
-    supabase.from('goals').select('*').eq('session_id', sessionId).single(),
+    supabase.from('profiles').select('*').eq('user_id', userId).single(),
+    supabase.from('goals').select('*').eq('user_id', userId).single(),
   ])
 
   // Load only messages from the current sprint (after goal was last set)
   const historyQuery = supabase
     .from('messages')
     .select('role, content')
-    .eq('session_id', sessionId)
+    .eq('user_id', userId)
     .order('created_at', { ascending: true })
     .limit(20)
 
@@ -82,7 +85,7 @@ export async function POST(req: NextRequest) {
 
   // Save user message
   await supabase.from('messages').insert({
-    session_id: sessionId,
+    user_id: userId,
     role: 'user',
     content: userContent,
   })
@@ -106,14 +109,14 @@ export async function POST(req: NextRequest) {
   // Save assistant message + update turn count
   await Promise.all([
     supabase.from('messages').insert({
-      session_id: sessionId,
+      user_id: userId,
       role: 'assistant',
       content: reply,
     }),
     supabase
       .from('sessions')
       .update({ turn_count: turnCount + 1, updated_at: new Date().toISOString() })
-      .eq('id', sessionId),
+      .eq('user_id', userId),
   ])
 
   const newCount = turnCount + 1
