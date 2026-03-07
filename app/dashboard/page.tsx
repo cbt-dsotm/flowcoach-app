@@ -46,6 +46,16 @@ const LEARNING_MODES = [
     href: null,
     live: false,
   },
+  {
+    id: 'deep-dive',
+    name: 'Deep Dive',
+    icon: '🤿',
+    tagline: 'A structured descent into mastery — one topic, start to finish',
+    description:
+      'Tell the Instructor what you want to master. They map the dive plan — surface concepts to deep-water expertise — and guide every session until you certify.',
+    href: null,
+    live: false,
+  },
 ]
 
 const TOTAL_SECTIONS = 7
@@ -172,12 +182,16 @@ export default function Dashboard() {
             Step 2 — Start learning
           </p>
           <div className="flex flex-col gap-3">
-            {LEARNING_MODES.map((mode) => (
+            {LEARNING_MODES.map((mode) => {
+              const isDeepDive = mode.id === 'deep-dive'
+              return (
               <div
                 key={mode.id}
                 className={`rounded-xl border px-5 py-4 transition-all ${
                   mode.live
                     ? 'border-zinc-900 bg-zinc-900 text-white shadow-sm'
+                    : isDeepDive
+                    ? 'border-teal-200 bg-teal-50'
                     : 'border-zinc-200 bg-white text-zinc-400'
                 }`}
               >
@@ -187,27 +201,29 @@ export default function Dashboard() {
                       <span className="text-base">{mode.icon}</span>
                       <span
                         className={`text-sm font-bold ${
-                          mode.live ? 'text-white' : 'text-zinc-400'
+                          mode.live ? 'text-white' : isDeepDive ? 'text-teal-900' : 'text-zinc-400'
                         }`}
                       >
                         {mode.name}
                       </span>
                       {!mode.live && (
-                        <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold text-zinc-400">
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                          isDeepDive ? 'bg-teal-100 text-teal-700' : 'bg-zinc-100 text-zinc-400'
+                        }`}>
                           Coming soon
                         </span>
                       )}
                     </div>
                     <p
                       className={`text-xs font-medium ${
-                        mode.live ? 'text-zinc-300' : 'text-zinc-400'
+                        mode.live ? 'text-zinc-300' : isDeepDive ? 'text-teal-700' : 'text-zinc-400'
                       }`}
                     >
                       {mode.tagline}
                     </p>
                     <p
                       className={`mt-1 text-xs leading-relaxed ${
-                        mode.live ? 'text-zinc-400' : 'text-zinc-300'
+                        mode.live ? 'text-zinc-400' : isDeepDive ? 'text-teal-600' : 'text-zinc-300'
                       }`}
                     >
                       {mode.description}
@@ -224,7 +240,8 @@ export default function Dashboard() {
                   )}
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
