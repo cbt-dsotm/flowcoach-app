@@ -27,6 +27,16 @@ const LEARNING_MODES = [
     live: false,
   },
   {
+    id: 'deep-dive',
+    name: 'Deep Dive',
+    icon: '🤿',
+    tagline: 'A structured descent into mastery — one topic, start to finish',
+    description:
+      'Tell the Instructor what you want to master. They map the dive plan — surface concepts to deep-water expertise — and guide every session until you certify.',
+    href: null,
+    live: false,
+  },
+  {
     id: 'flashcards',
     name: 'Flashcards',
     icon: '⚡',
@@ -43,16 +53,6 @@ const LEARNING_MODES = [
     tagline: 'Adaptive diagnostic assessment',
     description:
       'Find exactly where you are and what to tackle next. No generic tests — calibrated to your level.',
-    href: null,
-    live: false,
-  },
-  {
-    id: 'deep-dive',
-    name: 'Deep Dive',
-    icon: '🤿',
-    tagline: 'A structured descent into mastery — one topic, start to finish',
-    description:
-      'Tell the Instructor what you want to master. They map the dive plan — surface concepts to deep-water expertise — and guide every session until you certify.',
     href: null,
     live: false,
   },
@@ -75,6 +75,40 @@ interface LastGoal {
   topic: string
   win_condition: string | null
   confidence: number | null
+}
+
+function TierBadge({ label }: { label: string }) {
+  if (label === 'Basic') return (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="24" r="21" stroke="#d1d5db" strokeWidth="2.5"/>
+      <circle cx="24" cy="24" r="13" stroke="#d1d5db" strokeWidth="1.5" strokeDasharray="3 2"/>
+      <circle cx="24" cy="24" r="4" fill="#9ca3af"/>
+    </svg>
+  )
+  if (label === 'Good') return (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M24 4L7 11v13C7 33 15 41 24 44c9-3 17-11 17-20V11L24 4z" fill="#3b82f6"/>
+      <path d="M15 24l7 7 11-13" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+  if (label === 'Great') return (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M24 2L42 13v22L24 46 6 35V13L24 2z" fill="#6366f1"/>
+      <path d="M27 12L19 25h7L22 36l11-15h-7l1-9z" fill="white"/>
+    </svg>
+  )
+  // Exceptional
+  return (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="24" r="22" fill="#f59e0b"/>
+      <circle cx="24" cy="24" r="22" fill="none" stroke="#fbbf24" strokeWidth="1.5"/>
+      <path d="M13 34V24l7 5 4-10 4 10 7-5v10H13z" fill="white"/>
+      <rect x="12" y="35" width="24" height="3" rx="1.5" fill="white"/>
+      <circle cx="13" cy="24" r="2" fill="white"/>
+      <circle cx="24" cy="14" r="2" fill="white"/>
+      <circle cx="35" cy="24" r="2" fill="white"/>
+    </svg>
+  )
 }
 
 export default function Dashboard() {
@@ -130,15 +164,47 @@ export default function Dashboard() {
       </header>
 
       <main className="mx-auto max-w-2xl px-6 py-10">
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-2xl font-bold text-zinc-900">Welcome back.</h1>
           <p className="mt-1 text-sm text-zinc-500">
             FlowCoach adapts to how you think and learn — keeping you in Flow state.
           </p>
         </div>
 
-        {/* Profile — top card, featured */}
-        <div className="mb-3">
+        {/* Coaching status — badge + tier + topic actions */}
+        <div className="mb-4 rounded-xl border border-zinc-200 bg-white px-5 py-4">
+          <div className="flex items-center gap-4">
+            <TierBadge label={tier.label} />
+            <div className="flex flex-1 min-w-0 items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-zinc-900">{tier.label} coaching</p>
+                <p className="text-xs text-zinc-400">{tier.tagline}</p>
+              </div>
+              <div className="flex shrink-0 flex-col items-end gap-1.5">
+                {lastGoal ? (
+                  <Link
+                    href={`/learn?topic=${encodeURIComponent(lastGoal.topic)}${lastGoal.win_condition ? `&win=${encodeURIComponent(lastGoal.win_condition)}` : ''}${lastGoal.confidence ? `&confidence=${lastGoal.confidence}` : ''}`}
+                    className="text-xs font-medium text-zinc-700 hover:text-zinc-900 max-w-[160px] truncate text-right"
+                    title={lastGoal.topic}
+                  >
+                    Continue: {lastGoal.topic} →
+                  </Link>
+                ) : (
+                  <span className="text-xs text-zinc-300">No topic yet</span>
+                )}
+                <span className="cursor-default select-none text-xs text-zinc-300">
+                  Pick a topic{' '}
+                  <span className="rounded-full bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-400">
+                    🚧 soon
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Profile — featured card */}
+        <div className="mb-4">
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
             Step 1 — Build your profile
           </p>
@@ -178,35 +244,6 @@ export default function Dashboard() {
                 {completed === 0 ? 'Start here →' : 'Continue →'}
               </Link>
             </div>
-          </div>
-        </div>
-
-        {/* Status strip */}
-        <div className="mb-3 mt-4 flex items-center justify-between gap-4 rounded-xl border border-zinc-100 bg-white px-5 py-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${tier.pillClass}`}>
-              {tier.label}
-            </span>
-            <span className="truncate text-xs text-zinc-400">{tier.tagline}</span>
-          </div>
-          <div className="flex shrink-0 items-center gap-4">
-            {lastGoal ? (
-              <Link
-                href={`/learn?topic=${encodeURIComponent(lastGoal.topic)}${lastGoal.win_condition ? `&win=${encodeURIComponent(lastGoal.win_condition)}` : ''}${lastGoal.confidence ? `&confidence=${lastGoal.confidence}` : ''}`}
-                className="text-xs font-medium text-zinc-700 hover:text-zinc-900 truncate max-w-[140px]"
-                title={lastGoal.topic}
-              >
-                Continue: {lastGoal.topic} →
-              </Link>
-            ) : (
-              <span className="text-xs text-zinc-300">No topic yet</span>
-            )}
-            <span className="text-xs text-zinc-300 cursor-default select-none">
-              Pick a topic
-              <span className="ml-1 rounded-full bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-400">
-                🚧 soon
-              </span>
-            </span>
           </div>
         </div>
 
