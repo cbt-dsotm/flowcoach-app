@@ -25,22 +25,22 @@ export const TIER_INFO: Record<
   { label: string; what: string; nextHint: string | null }
 > = {
   basic: {
-    label: 'Basic',
+    label: 'Wanderer',
     what: 'Generic coaching — same content and examples for every learner, no personalization.',
-    nextHint: 'Complete Quick Profile (5 min) to unlock Good coaching.',
+    nextHint: 'Complete Quick Profile (5 min) to reach Seeker.',
   },
   good: {
-    label: 'Good',
+    label: 'Seeker',
     what: 'Claude knows your goal and background. It picks analogies that fit your world, calibrates depth to your level, and skips the preamble you don\'t need.',
-    nextHint: 'Complete Your Knowledge Map or What\'s Worked to unlock Great coaching.',
+    nextHint: 'Complete Your Knowledge Map or What\'s Worked to reach Pathfinder.',
   },
   great: {
-    label: 'Great',
+    label: 'Pathfinder',
     what: 'Claude knows your real knowledge gaps and what has blocked you before. It fills actual holes, avoids the explanations that haven\'t worked, and builds on what you already know.',
-    nextHint: 'Complete 2 more sections to unlock Exceptional coaching.',
+    nextHint: 'Complete 2 more sections to reach Cartographer.',
   },
   exceptional: {
-    label: 'Exceptional',
+    label: 'Cartographer',
     what: 'Claude has a complete picture of how you think, learn, and feel about the subject. Every mode — Learn, Practice, Flashcards — adapts to you specifically.',
     nextHint: null,
   },
@@ -76,7 +76,7 @@ export const PROFILE_SECTIONS: ProfileSection[] = [
     tagline: 'Cover all the essentials in 5 minutes',
     description:
       'One focused conversation that touches on your goal, background, knowledge level, and how you like to learn. The fastest way to get genuinely personalized coaching.',
-    unlockBadge: 'Unlocks Good',
+    unlockBadge: 'Unlocks Seeker',
     turnsBeforeSave: 8,
     openingMessage:
       "Let's build your profile quickly. I'll ask a few questions to understand how you learn best — it takes about 5 minutes and makes every session significantly more useful.\n\nLet's start with your overarching goal. Pick whichever of these resonates, and answer as much or as little as you like:\n\n1. What are you working on or building that's making you want to learn right now?\n2. What's the bigger version of yourself you're working toward — and what do you need to learn to get there?\n3. What keeps pulling at your attention lately? What do you find yourself coming back to?",
@@ -105,7 +105,7 @@ SUMMARY:
     tagline: 'What are you actually trying to achieve?',
     description:
       'Most people say what they want to learn, not why. This conversation excavates the real goal under the stated one — what success looks like, why it matters now, and what you\'ll be able to do when you get there.',
-    unlockBadge: 'Unlocks Good',
+    unlockBadge: 'Unlocks Seeker',
     turnsBeforeSave: 5,
     openingMessage:
       "Let's start with your overarching goal. Pick whichever of these resonates, and answer as much or as little as you like:\n\n1. What are you working on or building that's making you want to learn right now?\n2. What's the bigger version of yourself you're working toward — and what do you need to learn to get there?\n3. What keeps pulling at your attention lately? What do you find yourself coming back to?",
@@ -134,7 +134,7 @@ SUMMARY:
     tagline: 'What do you do and what do you already know?',
     description:
       'The best coaching uses analogies from your world. This conversation maps your professional background and adjacent knowledge so Claude can build bridges from what you already understand.',
-    unlockBadge: 'Unlocks Good',
+    unlockBadge: 'Unlocks Seeker',
     turnsBeforeSave: 5,
     openingMessage:
       "Good analogies make everything click faster — and they only work if they're from your world. What do you do professionally, and how would you describe what you're good at?",
@@ -163,7 +163,7 @@ SUMMARY:
     tagline: 'What\'s solid and what\'s fuzzy?',
     description:
       'A conversation that maps exactly where your mental model is strong and where it breaks down — so coaching can skip what you know, fill actual gaps, and fix the misconceptions that are quietly causing confusion.',
-    unlockBadge: 'Unlocks Great',
+    unlockBadge: 'Unlocks Pathfinder',
     turnsBeforeSave: 6,
     openingMessage:
       "Let's figure out exactly where you stand. Explain to me, in your own words, what you currently understand about this topic — like you're explaining it to a smart friend who's never heard of it.",
@@ -198,7 +198,7 @@ SUMMARY:
     tagline: 'Your learning history with this subject',
     description:
       'Past failed explanations leave marks. This conversation surfaces what teaching approaches have clicked for you and what has frustrated you — so Claude can avoid the traps and double down on what works.',
-    unlockBadge: 'Unlocks Great',
+    unlockBadge: 'Unlocks Pathfinder',
     turnsBeforeSave: 5,
     openingMessage:
       "Have you tried learning this before? Tell me about it — what happened, and where did things go well or fall apart?",
@@ -228,7 +228,7 @@ SUMMARY:
     tagline: 'Examples first or theory first? Challenge or scaffold?',
     description:
       'A short conversation about your genuine preferences — not the learning style buckets that don\'t hold up, but the real patterns: how you like information structured, how much ambiguity you can tolerate, and what kind of challenge keeps you in flow.',
-    unlockBadge: 'Unlocks Great',
+    unlockBadge: 'Unlocks Pathfinder',
     turnsBeforeSave: 5,
     openingMessage:
       "Think about a time you learned something new and it really clicked — what made it work? What was the teaching like?",
@@ -258,7 +258,7 @@ SUMMARY:
     tagline: 'Excited? Intimidated? Just pragmatic?',
     description:
       'Your emotional stance toward a subject shapes how you learn it. This conversation explores what this topic means to you — the baggage, the excitement, and what\'s at stake — so coaching can meet you where you actually are.',
-    unlockBadge: 'Unlocks Exceptional',
+    unlockBadge: 'Unlocks Cartographer',
     turnsBeforeSave: 5,
     openingMessage:
       "When you think about this subject, what's your honest gut reaction? Not what you think you should feel — what do you actually feel?",

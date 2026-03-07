@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase-client'
@@ -90,15 +90,15 @@ const LEARNING_MODES = [
 
 const TOTAL_SECTIONS = 7
 
-const TIER_LABELS: Record<number, { label: string; tagline: string; pillClass: string; topAccent: string; bandBg: string }> = {
-  0: { label: 'Basic',       tagline: 'Generic coaching — same for everyone',                   pillClass: 'bg-zinc-600 text-zinc-200',      topAccent: 'border-t-zinc-400',    bandBg: 'bg-zinc-800' },
-  1: { label: 'Good',        tagline: 'Claude knows your goal and background',                  pillClass: 'bg-blue-900 text-blue-300',       topAccent: 'border-t-blue-400',    bandBg: 'bg-blue-950' },
-  2: { label: 'Good',        tagline: 'Claude knows your goal and background',                  pillClass: 'bg-blue-900 text-blue-300',       topAccent: 'border-t-blue-400',    bandBg: 'bg-blue-950' },
-  3: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',          pillClass: 'bg-indigo-900 text-indigo-300',   topAccent: 'border-t-indigo-400',  bandBg: 'bg-indigo-950' },
-  4: { label: 'Great',       tagline: 'Claude skips what you know, fills actual gaps',          pillClass: 'bg-indigo-900 text-indigo-300',   topAccent: 'border-t-indigo-400',  bandBg: 'bg-indigo-950' },
-  5: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-900 text-emerald-300', topAccent: 'border-t-emerald-400', bandBg: 'bg-emerald-950' },
-  6: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-900 text-emerald-300', topAccent: 'border-t-emerald-400', bandBg: 'bg-emerald-950' },
-  7: { label: 'Exceptional', tagline: 'Fully adaptive — Claude knows how you think and learn', pillClass: 'bg-emerald-900 text-emerald-300', topAccent: 'border-t-emerald-400', bandBg: 'bg-emerald-950' },
+const TIER_LABELS: Record<number, { label: string; tagline: string; pillClass: string }> = {
+  0: { label: 'Wanderer',    tagline: 'You showed up. That\'s the whole first step.',                              pillClass: 'bg-zinc-100 text-zinc-600' },
+  1: { label: 'Seeker',      tagline: 'Claude knows what you\'re chasing. The coaching gets sharper from here.',  pillClass: 'bg-blue-100 text-blue-700' },
+  2: { label: 'Seeker',      tagline: 'Claude knows what you\'re chasing. The coaching gets sharper from here.',  pillClass: 'bg-blue-100 text-blue-700' },
+  3: { label: 'Pathfinder',  tagline: 'You\'ve shared enough that Claude can get out of your way and go deeper.', pillClass: 'bg-indigo-100 text-indigo-700' },
+  4: { label: 'Pathfinder',  tagline: 'You\'ve shared enough that Claude can get out of your way and go deeper.', pillClass: 'bg-indigo-100 text-indigo-700' },
+  5: { label: 'Cartographer',tagline: 'Claude knows how you think. This is what fully fitted feels like.',        pillClass: 'bg-amber-100 text-amber-700' },
+  6: { label: 'Cartographer',tagline: 'Claude knows how you think. This is what fully fitted feels like.',        pillClass: 'bg-amber-100 text-amber-700' },
+  7: { label: 'Cartographer',tagline: 'Claude knows how you think. This is what fully fitted feels like.',        pillClass: 'bg-amber-100 text-amber-700' },
 }
 
 interface LastGoal {
@@ -108,36 +108,142 @@ interface LastGoal {
 }
 
 function TierBadge({ label, size = 48 }: { label: string; size?: number }) {
-  if (label === 'Basic') return (
+  // Wanderer: outline-only compass star, zinc gray — potential not yet awakened
+  if (label === 'Wanderer') return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="24" cy="24" r="21" stroke="#e4e4e7" strokeWidth="2.5"/>
-      <circle cx="24" cy="24" r="13" stroke="#e4e4e7" strokeWidth="1.5" strokeDasharray="3 2"/>
-      <circle cx="24" cy="24" r="4" fill="#d4d4d8"/>
+      <polygon
+        points="24,4 26,19 33,16 30,22 44,24 30,26 33,32 26,29 24,44 22,29 15,32 18,26 4,24 18,22 15,16 22,19"
+        stroke="#a1a1aa" strokeWidth="1.5" fill="none"
+      />
+      <circle cx="24" cy="24" r="2.5" stroke="#a1a1aa" strokeWidth="1.5" fill="none"/>
     </svg>
   )
-  if (label === 'Good') return (
+  // Seeker: star lightly filled zinc, north petal lit in amber — direction found
+  if (label === 'Seeker') return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M24 4L7 11v13C7 33 15 41 24 44c9-3 17-11 17-20V11L24 4z" fill="#3b82f6"/>
-      <path d="M15 24l7 7 11-13" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+      <polygon
+        points="24,4 26,19 33,16 30,22 44,24 30,26 33,32 26,29 24,44 22,29 15,32 18,26 4,24 18,22 15,16 22,19"
+        fill="#f4f4f5" stroke="#d4d4d8" strokeWidth="1"
+      />
+      {/* North petal: from center (24,24) up to tip (24,4) via (26,19) and (22,19) */}
+      <polygon points="24,4 26,19 24,24 22,19" fill="#f59e0b"/>
+      <circle cx="24" cy="24" r="2.5" fill="#a1a1aa"/>
     </svg>
   )
-  if (label === 'Great') return (
+  // Pathfinder: cardinal petals lit amber, partial arc trail — charting the way
+  if (label === 'Pathfinder') return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M24 2L42 13v22L24 46 6 35V13L24 2z" fill="#6366f1"/>
-      <path d="M27 12L19 25h7L22 36l11-15h-7l1-9z" fill="white"/>
+      <polygon
+        points="24,4 26,19 33,16 30,22 44,24 30,26 33,32 26,29 24,44 22,29 15,32 18,26 4,24 18,22 15,16 22,19"
+        fill="#fef3c7" stroke="#f59e0b" strokeWidth="1"
+      />
+      {/* N petal */}
+      <polygon points="24,4 26,19 24,24 22,19" fill="#f59e0b"/>
+      {/* E petal */}
+      <polygon points="44,24 29,22 24,24 29,26" fill="#f59e0b"/>
+      {/* S petal */}
+      <polygon points="24,44 26,29 24,24 22,29" fill="#f59e0b"/>
+      {/* W petal */}
+      <polygon points="4,24 19,26 24,24 19,22" fill="#f59e0b"/>
+      {/* Partial arc trail ~270° (skipping NW quadrant) */}
+      <path d="M24 2 A22 22 0 1 1 2 24" stroke="#f59e0b" strokeWidth="1.5" fill="none" strokeDasharray="2 2"/>
+      <circle cx="24" cy="24" r="2.5" fill="#f59e0b"/>
     </svg>
   )
-  // Exceptional
+  // Cartographer: fully lit amber rose, complete circle trail, white center — the map is made
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="24" cy="24" r="22" fill="#f59e0b"/>
-      <circle cx="24" cy="24" r="22" fill="none" stroke="#fbbf24" strokeWidth="1.5"/>
-      <path d="M13 34V24l7 5 4-10 4 10 7-5v10H13z" fill="white"/>
-      <rect x="12" y="35" width="24" height="3" rx="1.5" fill="white"/>
-      <circle cx="13" cy="24" r="2" fill="white"/>
-      <circle cx="24" cy="14" r="2" fill="white"/>
-      <circle cx="35" cy="24" r="2" fill="white"/>
+      <circle cx="24" cy="24" r="22" stroke="#f59e0b" strokeWidth="1.5" fill="none"/>
+      <polygon
+        points="24,4 26,19 33,16 30,22 44,24 30,26 33,32 26,29 24,44 22,29 15,32 18,26 4,24 18,22 15,16 22,19"
+        fill="#f59e0b" stroke="#d97706" strokeWidth="0.5"
+      />
+      <circle cx="24" cy="24" r="3" fill="white"/>
     </svg>
+  )
+}
+
+const TOOLTIP_TIERS = [
+  {
+    label: 'Wanderer',
+    desc: 'No personalization yet. Same content and examples for every learner.',
+  },
+  {
+    label: 'Seeker',
+    desc: 'Claude knows your goal and background. Analogies that fit your world, depth calibrated to your level.',
+  },
+  {
+    label: 'Pathfinder',
+    desc: 'Claude knows your real gaps and what\'s blocked you before. Fills actual holes, avoids what hasn\'t worked.',
+  },
+  {
+    label: 'Cartographer',
+    desc: 'Fully fitted. Claude knows how you think across every mode — Learn, Practice, Flashcards.',
+  },
+]
+
+function TierBadgeWithTooltip({ label, size = 44 }: { label: string; size?: number }) {
+  const [open, setOpen] = useState(false)
+  const [hoveredTier, setHoveredTier] = useState<string | null>(null)
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function handleEnter() {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+    setOpen(true)
+  }
+
+  function handleLeave() {
+    closeTimer.current = setTimeout(() => {
+      setOpen(false)
+      setHoveredTier(null)
+    }, 120)
+  }
+
+  return (
+    <div
+      className="relative shrink-0 cursor-default"
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      <Link href="/profile" title="Build your profile">
+        <TierBadge label={label} size={size} />
+      </Link>
+      {open && (
+        <div
+          className="absolute left-0 top-full z-20 mt-1 w-72 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl"
+          onMouseEnter={handleEnter}
+          onMouseLeave={handleLeave}
+        >
+          <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+            Coaching levels
+          </p>
+          <div className="flex flex-col gap-3">
+            {TOOLTIP_TIERS.map((t) => {
+              const isCurrent = t.label === label
+              const isHovered = hoveredTier === t.label
+              return (
+                <div
+                  key={t.label}
+                  className={`flex cursor-default items-start gap-2.5 rounded-lg px-1 py-0.5 transition-opacity ${isCurrent ? '' : 'opacity-40'} ${isHovered ? 'opacity-100' : ''}`}
+                  onMouseEnter={() => setHoveredTier(t.label)}
+                  onMouseLeave={() => setHoveredTier(null)}
+                >
+                  <div className="mt-0.5 shrink-0">
+                    <TierBadge label={t.label} size={32} />
+                  </div>
+                  <div>
+                    <p className={`text-xs transition-all ${isCurrent || isHovered ? 'font-bold text-zinc-900' : 'font-semibold text-zinc-500'}`}>
+                      {t.label}
+                    </p>
+                    <p className="text-[11px] leading-snug text-zinc-400">{t.desc}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -194,91 +300,73 @@ export default function Dashboard() {
       </header>
 
       <main className="mx-auto max-w-3xl px-6 py-10">
-        {/* Page opening — identity + status, no box */}
+        {/* Identity row: rank greeting left, profile status right */}
         <div className="mb-8">
-          <div className="flex items-start justify-between gap-6">
-            <div className="min-w-0">
-              <h1 className="text-2xl font-bold text-zinc-900">Welcome back.</h1>
-              <div className="mt-4 flex items-center gap-3">
-                <TierBadge label={tier.label} size={36} />
-                <div>
-                  <p className="text-sm font-semibold text-zinc-800">{tier.label} coaching</p>
-                  <p className="text-xs text-zinc-500">{tier.tagline}</p>
-                </div>
+          <div className="flex items-center justify-between gap-6">
+            {/* Left: badge + rank as the greeting */}
+            <div className="flex items-center gap-3">
+              <TierBadgeWithTooltip label={tier.label} size={44} />
+              <div>
+                <h1 className="text-2xl font-bold text-zinc-900">
+                  Welcome back, {tier.label}.
+                </h1>
+                <p className="mt-0.5 text-xs text-zinc-500">{tier.tagline}</p>
               </div>
             </div>
-            <div className="flex shrink-0 flex-col items-end gap-2 pt-1">
-              {lastGoal ? (
-                <Link
-                  href={`/learn?topic=${encodeURIComponent(lastGoal.topic)}${lastGoal.win_condition ? `&win=${encodeURIComponent(lastGoal.win_condition)}` : ''}${lastGoal.confidence ? `&confidence=${lastGoal.confidence}` : ''}`}
-                  className="max-w-[200px] truncate text-right text-sm font-medium text-zinc-700 hover:text-zinc-900"
-                  title={lastGoal.topic}
-                >
-                  Continue: {lastGoal.topic} →
-                </Link>
-              ) : (
-                <span className="text-sm text-zinc-400">No topic yet</span>
-              )}
-              <span className="cursor-default select-none text-xs text-zinc-400">
-                Pick a topic{' '}
-                <span className="rounded-full bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-400">
-                  🚧 soon
-                </span>
-              </span>
+
+            {/* Right: profile status — no card, just info + link */}
+            <div className="flex shrink-0 flex-col items-end gap-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-zinc-600">Your Profile</span>
+                {profileLoaded && (
+                  <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold text-zinc-500">
+                    {completed === 0 ? 'Not started' : `${completed} of ${TOTAL_SECTIONS}`}
+                  </span>
+                )}
+              </div>
+              <p className="max-w-[180px] text-right text-[11px] leading-snug text-zinc-400">
+                {completed === 0
+                  ? '5 min → unlocks Seeker coaching'
+                  : completed < 3
+                  ? `${3 - completed} more section${3 - completed === 1 ? '' : 's'} → Pathfinder`
+                  : completed < 5
+                  ? `${5 - completed} more section${5 - completed === 1 ? '' : 's'} → Cartographer`
+                  : 'Fully fitted coaching'}
+              </p>
+              <Link
+                href="/profile"
+                className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
+              >
+                {completed === 0 ? 'Build your profile →' : completed < 7 ? 'Continue →' : 'View profile →'}
+              </Link>
             </div>
           </div>
           <div className="mt-5 border-b border-zinc-200" />
         </div>
 
-        {/* Profile — featured card */}
-        <div className="mb-4">
-          <p className="mb-2 border-l-2 border-zinc-300 pl-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-            Step 1 — Build your profile
-          </p>
-          <div className="rounded-xl border-2 border-indigo-300 bg-indigo-100 px-5 py-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">🧠</span>
-                  <span className="text-sm font-bold text-indigo-900">Your Profile</span>
-                  {profileLoaded && (
-                    <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-semibold text-indigo-700">
-                      {completed === 0
-                        ? 'Not started'
-                        : `${completed} of ${TOTAL_SECTIONS} sections`}
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs font-medium text-indigo-700">
-                  {profileLoaded && completed > 0
-                    ? `${tier.label} coaching — ${tier.tagline}`
-                    : 'The more Claude knows about you, the better it teaches you'}
-                </p>
-                <p className="mt-1 text-xs leading-relaxed text-indigo-600">
-                  {completed === 0
-                    ? 'Start with the 5-minute Quick Profile. Every section you complete unlocks more personalized coaching across Learn, Practice, and every other mode.'
-                    : completed < 3
-                    ? 'Good start. Complete 2 more sections to unlock Great coaching — Claude will know your actual gaps and what has blocked you before.'
-                    : completed < 5
-                    ? 'Great coaching unlocked. Complete 2 more sections to reach Exceptional — fully adaptive across every mode.'
-                    : 'Exceptional coaching unlocked. You can always update sections as you grow.'}
-                </p>
-              </div>
-              <Link
-                href="/profile"
-                className="shrink-0 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-indigo-700"
-              >
-                {completed === 0 ? 'Start here →' : 'Continue →'}
-              </Link>
-            </div>
-          </div>
+        {/* Topic row — below the rule, above mode cards */}
+        <div className="mb-4 flex items-center gap-4">
+          {lastGoal ? (
+            <Link
+              href={`/learn?topic=${encodeURIComponent(lastGoal.topic)}${lastGoal.win_condition ? `&win=${encodeURIComponent(lastGoal.win_condition)}` : ''}${lastGoal.confidence ? `&confidence=${lastGoal.confidence}` : ''}`}
+              className="max-w-[240px] truncate text-sm font-medium text-zinc-700 hover:text-zinc-900"
+              title={lastGoal.topic}
+            >
+              Continue: {lastGoal.topic} →
+            </Link>
+          ) : (
+            <span className="text-sm text-zinc-400">No topic yet</span>
+          )}
+          <span className="cursor-default select-none text-xs text-zinc-400">
+            Pick a topic{' '}
+            <span className="rounded-full bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-400">
+              🚧 soon
+            </span>
+          </span>
         </div>
 
         {/* Learning modes */}
-        <div className="mt-2">
-          <p className="mb-2 border-l-2 border-zinc-300 pl-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-            Step 2 — Start learning
-          </p>
+        <div>
           <div className="flex flex-col gap-3">
             {/* Live modes — full width */}
             {LEARNING_MODES.filter(m => m.live).map((mode) => (

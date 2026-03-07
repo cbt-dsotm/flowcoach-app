@@ -14,6 +14,40 @@ import {
 
 const TIER_ORDER: ProfileTier[] = ['basic', 'good', 'great', 'exceptional']
 
+function TierBadge({ label, size = 32 }: { label: string; size?: number }) {
+  if (label === 'Wanderer') return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="24,4 26,19 33,16 30,22 44,24 30,26 33,32 26,29 24,44 22,29 15,32 18,26 4,24 18,22 15,16 22,19" stroke="#a1a1aa" strokeWidth="1.5" fill="none"/>
+      <circle cx="24" cy="24" r="2.5" stroke="#a1a1aa" strokeWidth="1.5" fill="none"/>
+    </svg>
+  )
+  if (label === 'Seeker') return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="24,4 26,19 33,16 30,22 44,24 30,26 33,32 26,29 24,44 22,29 15,32 18,26 4,24 18,22 15,16 22,19" fill="#f4f4f5" stroke="#d4d4d8" strokeWidth="1"/>
+      <polygon points="24,4 26,19 24,24 22,19" fill="#f59e0b"/>
+      <circle cx="24" cy="24" r="2.5" fill="#a1a1aa"/>
+    </svg>
+  )
+  if (label === 'Pathfinder') return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="24,4 26,19 33,16 30,22 44,24 30,26 33,32 26,29 24,44 22,29 15,32 18,26 4,24 18,22 15,16 22,19" fill="#fef3c7" stroke="#f59e0b" strokeWidth="1"/>
+      <polygon points="24,4 26,19 24,24 22,19" fill="#f59e0b"/>
+      <polygon points="44,24 29,22 24,24 29,26" fill="#f59e0b"/>
+      <polygon points="24,44 26,29 24,24 22,29" fill="#f59e0b"/>
+      <polygon points="4,24 19,26 24,24 19,22" fill="#f59e0b"/>
+      <path d="M24 2 A22 22 0 1 1 2 24" stroke="#f59e0b" strokeWidth="1.5" fill="none" strokeDasharray="2 2"/>
+      <circle cx="24" cy="24" r="2.5" fill="#f59e0b"/>
+    </svg>
+  )
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="24" r="22" stroke="#f59e0b" strokeWidth="1.5" fill="none"/>
+      <polygon points="24,4 26,19 33,16 30,22 44,24 30,26 33,32 26,29 24,44 22,29 15,32 18,26 4,24 18,22 15,16 22,19" fill="#f59e0b" stroke="#d97706" strokeWidth="0.5"/>
+      <circle cx="24" cy="24" r="3" fill="white"/>
+    </svg>
+  )
+}
+
 function TierLadder({
   tier,
   profileData,
@@ -243,6 +277,35 @@ export default function ProfilePage() {
         {/* Tier ladder */}
         <div className="mb-6">
           <TierLadder tier={tier} profileData={profileData} />
+        </div>
+
+        {/* Coaching levels — placeholder for design pass */}
+        <div className="mb-6 rounded-xl border border-zinc-200 bg-white p-5">
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+            What each level gets you
+          </p>
+          <div className="flex flex-col gap-4">
+            {TIER_ORDER.map((t) => {
+              const isCurrent = t === tier
+              return (
+                <div key={t} className={`flex items-start gap-3 ${isCurrent ? '' : 'opacity-40'}`}>
+                  <div className="shrink-0">
+                    <TierBadge label={TIER_INFO[t].label} size={32} />
+                  </div>
+                  <div>
+                    <p className={`text-xs font-semibold ${isCurrent ? 'text-zinc-900' : 'text-zinc-500'}`}>
+                      {TIER_INFO[t].label}
+                      {isCurrent && <span className="ml-1.5 text-[10px] font-normal text-zinc-400">← you are here</span>}
+                    </p>
+                    <p className="mt-0.5 text-[11px] leading-snug text-zinc-500">{TIER_INFO[t].what}</p>
+                    {TIER_INFO[t].nextHint && isCurrent && (
+                      <p className="mt-1 text-[10px] text-indigo-500">↑ {TIER_INFO[t].nextHint}</p>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
 
         {/* Quick Profile — featured */}
