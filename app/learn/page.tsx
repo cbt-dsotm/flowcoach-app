@@ -7,7 +7,6 @@ import ReactMarkdown from 'react-markdown'
 
 type Hat = 'white' | 'yellow' | 'black' | 'red' | 'green' | 'blue'
 
-const ALL_HATS: Hat[] = ['white', 'yellow', 'black', 'red', 'green', 'blue']
 const LEVEL_MIN = -4
 const LEVEL_MAX = 4
 
@@ -62,43 +61,15 @@ function LearnContent() {
 
   const activeLevel = hatLevels[activeHat] ?? 0
 
-  // On mount: generate white at level 0
+  // Stream white hat on mount
   useEffect(() => {
-    if (topic) generate('white', 0)
+    if (topic) stream('white', 0)
   }, [topic]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // After white level 0 loads: preload all other hat defaults + white adjacents
-  useEffect(() => {
-    if (!cache[cacheKey('white', 0)]) return
-    ALL_HATS.slice(1).forEach(hat => maybeGenerate(hat, 0))
-    maybeGenerate('white', -1)
-    maybeGenerate('white', 1)
-  }, [!!cache[cacheKey('white', 0)]]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // After each non-white hat's level 0 loads: preload its adjacents
-  useEffect(() => {
-    ALL_HATS.slice(1).forEach(hat => {
-      if (cache[cacheKey(hat, 0)]) {
-        maybeGenerate(hat, -1)
-        maybeGenerate(hat, 1)
-      }
-    })
-  }, [ // eslint-disable-line react-hooks/exhaustive-deps
-    !!cache[cacheKey('yellow', 0)],
-    !!cache[cacheKey('black',  0)],
-    !!cache[cacheKey('red',    0)],
-    !!cache[cacheKey('green',  0)],
-    !!cache[cacheKey('blue',   0)],
-  ])
-
-  function maybeGenerate(hat: Hat, level: number) {
-    if (level < LEVEL_MIN || level > LEVEL_MAX) return
+  async function stream(hat: Hat, level: number) {
     const key = cacheKey(hat, level)
-    if (!cache[key] && !loading.has(key)) generate(hat, level)
-  }
+    if (cache[key] || loading.has(key)) return
 
-  async function generate(hat: Hat, level: number) {
-    const key = cacheKey(hat, level)
     setLoading(prev => new Set(prev).add(key))
 
     try {
@@ -140,14 +111,7 @@ function LearnContent() {
   function selectHat(hat: Hat) {
     setActiveHat(hat)
     contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
-    const level = hatLevels[hat] ?? 0
-    maybeGenerate(hat, level)
-    if (!cache[cacheKey(hat, 0)]) {
-      // First visit — preload default + adjacents
-      maybeGenerate(hat, 0)
-      maybeGenerate(hat, -1)
-      maybeGenerate(hat, 1)
-    }
+    stream(hat, hatLevels[hat] ?? 0)
   }
 
   function changeLevel(direction: 'easier' | 'deeper') {
@@ -156,17 +120,13 @@ function LearnContent() {
     if (next < LEVEL_MIN || next > LEVEL_MAX) return
     setHatLevels(prev => ({ ...prev, [activeHat]: next }))
     contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
-    maybeGenerate(activeHat, next)
-    // Preload one more step in the same direction
-    maybeGenerate(activeHat, direction === 'easier' ? next - 1 : next + 1)
+    stream(activeHat, next)
   }
 
   const activeKey = cacheKey(activeHat, activeLevel)
   const content = cache[activeKey]
-  const isActiveLoading = loading.has(activeKey)
+  const isStreaming = loading.has(activeKey)
   const activeHatMeta = HATS.find(h => h.id === activeHat)!
-  const canGoEasier = activeLevel > LEVEL_MIN
-  const canGoDeeper = activeLevel < LEVEL_MAX
 
   return (
     <div className="flex h-screen flex-col bg-zinc-50">
@@ -189,28 +149,22 @@ function LearnContent() {
       <div className="border-b border-zinc-200 bg-white px-6 py-3 shrink-0">
         <div className="mx-auto max-w-2xl">
           <div className="flex gap-1.5">
-            {HATS.map(h => {
-              const isDefaultLoading = loading.has(cacheKey(h.id, 0))
-              const isDefaultCached = !!cache[cacheKey(h.id, 0)]
-              return (
-                <button
-                  key={h.id}
-                  onClick={() => selectHat(h.id)}
-                  className={`flex flex-1 flex-col items-center rounded-lg border px-1 py-1.5 text-center transition-colors ${
-                    activeHat === h.id
-                      ? h.activeClass
-                      : isDefaultCached
-                      ? 'border-zinc-300 text-zinc-600 hover:border-zinc-400 hover:bg-zinc-50'
-                      : 'border-zinc-200 text-zinc-400 hover:border-zinc-300 hover:bg-zinc-50'
-                  }`}
-                >
-                  <span className="text-xs font-semibold leading-none">{h.label}</span>
-                  <span className="text-[10px] leading-none opacity-70">
-                    {isDefaultLoading && activeHat !== h.id ? '…' : h.description}
-                  </span>
-                </button>
-              )
-            })}
+            {HATS.map(h => (
+              <button
+                key={h.id}
+                onClick={() => selectHat(h.id)}
+                className={`flex flex-1 flex-col items-center rounded-lg border px-1 py-1.5 text-center transition-colors ${
+                  activeHat === h.id
+                    ? h.activeClass
+                    : cache[cacheKey(h.id, hatLevels[h.id] ?? 0)]
+                    ? 'border-zinc-300 text-zinc-600 hover:border-zinc-400 hover:bg-zinc-50'
+                    : 'border-zinc-200 text-zinc-400 hover:border-zinc-300 hover:bg-zinc-50'
+                }`}
+              >
+                <span className="text-xs font-semibold leading-none">{h.label}</span>
+                <span className="text-[10px] leading-none opacity-70">{h.description}</span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -223,11 +177,11 @@ function LearnContent() {
         {content ? (
           <div className="prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-headings:my-3">
             <ReactMarkdown>{content}</ReactMarkdown>
-            {isActiveLoading && (
+            {isStreaming && (
               <span className="inline-block h-3 w-0.5 animate-pulse bg-zinc-400 ml-0.5" />
             )}
           </div>
-        ) : isActiveLoading ? (
+        ) : isStreaming ? (
           <div className="flex items-center justify-center py-16">
             <span className="text-sm text-zinc-400">
               Generating {activeHatMeta.label} Hat perspective…
@@ -239,7 +193,7 @@ function LearnContent() {
               {HAT_DESCRIPTIONS[activeHat]}
             </p>
             <button
-              onClick={() => generate(activeHat, activeLevel)}
+              onClick={() => stream(activeHat, activeLevel)}
               className="rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-700"
             >
               Generate {activeHatMeta.label} Hat
@@ -249,20 +203,20 @@ function LearnContent() {
       </main>
 
       {/* Difficulty + footer */}
-      {(content || isActiveLoading) && (
+      {(content || isStreaming) && (
         <div className="border-t border-zinc-100 bg-white px-6 py-3 shrink-0">
           <div className="mx-auto max-w-2xl flex items-center justify-between gap-4">
             <div className="flex gap-2">
               <button
                 onClick={() => changeLevel('easier')}
-                disabled={!canGoEasier || isActiveLoading}
+                disabled={isStreaming || activeLevel <= LEVEL_MIN}
                 className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:border-zinc-400 disabled:opacity-30"
               >
                 Make this easier
               </button>
               <button
                 onClick={() => changeLevel('deeper')}
-                disabled={!canGoDeeper || isActiveLoading}
+                disabled={isStreaming || activeLevel >= LEVEL_MAX}
                 className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:border-zinc-400 disabled:opacity-30"
               >
                 Let's go deeper
@@ -274,10 +228,7 @@ function LearnContent() {
                   {activeLevel < 0 ? `${Math.abs(activeLevel)} simpler` : `${activeLevel} deeper`}
                 </span>
               )}
-              <Link
-                href="/dashboard"
-                className="text-xs font-medium text-zinc-500 hover:text-zinc-800"
-              >
+              <Link href="/dashboard" className="text-xs font-medium text-zinc-500 hover:text-zinc-800">
                 Done →
               </Link>
             </div>
