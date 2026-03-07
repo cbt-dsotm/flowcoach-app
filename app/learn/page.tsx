@@ -6,16 +6,10 @@ import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 
 type Hat = 'white' | 'yellow' | 'black' | 'red' | 'green' | 'blue'
-type Version = 'default' | 'easier' | 'deeper'
-type CacheKey = `${Hat}-${Version}`
 
 const ALL_HATS: Hat[] = ['white', 'yellow', 'black', 'red', 'green', 'blue']
-
-const DIFFICULTY_INSTRUCTION: Record<Version, string | null> = {
-  default: null,
-  easier: 'Simplify: reduce scope, use more basic examples, assume less prior knowledge',
-  deeper: 'Go deeper: increase specificity, add nuance, assume stronger prior knowledge',
-}
+const LEVEL_MIN = -4
+const LEVEL_MAX = 4
 
 const HATS: { id: Hat; label: string; description: string; activeClass: string }[] = [
   { id: 'white',  label: 'White',  description: 'Facts',    activeClass: 'border-zinc-900 bg-zinc-900 text-white' },
@@ -35,8 +29,23 @@ const HAT_DESCRIPTIONS: Record<Hat, string> = {
   blue:   'How to think about learning this topic — the process.',
 }
 
-function cacheKey(hat: Hat, version: Version): CacheKey {
-  return `${hat}-${version}`
+function levelInstruction(level: number): string | null {
+  if (level === 0) return null
+  const map: Record<number, string> = {
+    '-4': 'Extremely basic — assume zero prior knowledge, use the simplest everyday language and analogies, no jargon whatsoever',
+    '-3': 'Very simple — assume minimal prior knowledge, avoid jargon, use concrete everyday examples',
+    '-2': 'Simple — assume little prior knowledge, keep it accessible with clear examples',
+    '-1': 'Slightly simpler than default — use clearer examples and less technical language',
+     '1': 'Slightly deeper than default — add more specificity and nuance',
+     '2': 'Advanced — assume solid foundation, go into technical detail and edge cases',
+     '3': 'Very advanced — assume strong prior knowledge, explore mechanisms and theory',
+     '4': 'Expert level — assume deep expertise, explore frontier concepts and subtle distinctions',
+  }
+  return map[level] ?? (level < 0 ? 'Very simple — assume minimal prior knowledge' : 'Very advanced — assume expert-level knowledge')
+}
+
+function cacheKey(hat: Hat, level: number): string {
+  return `${hat}:${level}`
 }
 
 function LearnContent() {
@@ -46,47 +55,50 @@ function LearnContent() {
   const confidence = searchParams.get('confidence') ? Number(searchParams.get('confidence')) : null
 
   const [activeHat, setActiveHat] = useState<Hat>('white')
-  const [hatVersions, setHatVersions] = useState<Partial<Record<Hat, Version>>>({})
-  const [cache, setCache] = useState<Partial<Record<CacheKey, string>>>({})
-  const [loading, setLoading] = useState<Set<CacheKey>>(new Set())
+  const [hatLevels, setHatLevels] = useState<Partial<Record<Hat, number>>>({})
+  const [cache, setCache] = useState<Record<string, string>>({})
+  const [loading, setLoading] = useState<Set<string>>(new Set())
   const contentRef = useRef<HTMLDivElement>(null)
 
-  // On mount: generate white-default
+  const activeLevel = hatLevels[activeHat] ?? 0
+
+  // On mount: generate white at level 0
   useEffect(() => {
-    if (topic) generate('white', 'default')
+    if (topic) generate('white', 0)
   }, [topic]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // After white-default loads: preload all other hat defaults + white variants
+  // After white level 0 loads: preload all other hat defaults + white adjacents
   useEffect(() => {
-    if (!cache[cacheKey('white', 'default')]) return
-    ALL_HATS.slice(1).forEach(hat => maybeGenerate(hat, 'default'))
-    maybeGenerate('white', 'easier')
-    maybeGenerate('white', 'deeper')
-  }, [!!cache[cacheKey('white', 'default')]]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (!cache[cacheKey('white', 0)]) return
+    ALL_HATS.slice(1).forEach(hat => maybeGenerate(hat, 0))
+    maybeGenerate('white', -1)
+    maybeGenerate('white', 1)
+  }, [!!cache[cacheKey('white', 0)]]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // After each hat's default loads: preload its variants
+  // After each non-white hat's level 0 loads: preload its adjacents
   useEffect(() => {
-    ALL_HATS.forEach(hat => {
-      if (cache[cacheKey(hat, 'default')]) {
-        maybeGenerate(hat, 'easier')
-        maybeGenerate(hat, 'deeper')
+    ALL_HATS.slice(1).forEach(hat => {
+      if (cache[cacheKey(hat, 0)]) {
+        maybeGenerate(hat, -1)
+        maybeGenerate(hat, 1)
       }
     })
   }, [ // eslint-disable-line react-hooks/exhaustive-deps
-    !!cache[cacheKey('yellow', 'default')],
-    !!cache[cacheKey('black', 'default')],
-    !!cache[cacheKey('red', 'default')],
-    !!cache[cacheKey('green', 'default')],
-    !!cache[cacheKey('blue', 'default')],
+    !!cache[cacheKey('yellow', 0)],
+    !!cache[cacheKey('black',  0)],
+    !!cache[cacheKey('red',    0)],
+    !!cache[cacheKey('green',  0)],
+    !!cache[cacheKey('blue',   0)],
   ])
 
-  function maybeGenerate(hat: Hat, version: Version) {
-    const key = cacheKey(hat, version)
-    if (!cache[key] && !loading.has(key)) generate(hat, version)
+  function maybeGenerate(hat: Hat, level: number) {
+    if (level < LEVEL_MIN || level > LEVEL_MAX) return
+    const key = cacheKey(hat, level)
+    if (!cache[key] && !loading.has(key)) generate(hat, level)
   }
 
-  async function generate(hat: Hat, version: Version) {
-    const key = cacheKey(hat, version)
+  async function generate(hat: Hat, level: number) {
+    const key = cacheKey(hat, level)
     setLoading(prev => new Set(prev).add(key))
 
     try {
@@ -98,7 +110,7 @@ function LearnContent() {
           topic,
           win_condition: winCondition,
           confidence,
-          difficulty_instruction: DIFFICULTY_INSTRUCTION[version],
+          difficulty_instruction: levelInstruction(level),
         }),
       })
 
@@ -128,25 +140,33 @@ function LearnContent() {
   function selectHat(hat: Hat) {
     setActiveHat(hat)
     contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
-    maybeGenerate(hat, 'default')
-    if (!cache[cacheKey(hat, 'default')]) {
-      // First visit — preload variants
-      maybeGenerate(hat, 'easier')
-      maybeGenerate(hat, 'deeper')
+    const level = hatLevels[hat] ?? 0
+    maybeGenerate(hat, level)
+    if (!cache[cacheKey(hat, 0)]) {
+      // First visit — preload default + adjacents
+      maybeGenerate(hat, 0)
+      maybeGenerate(hat, -1)
+      maybeGenerate(hat, 1)
     }
   }
 
-  function applyDifficulty(version: 'easier' | 'deeper') {
-    setHatVersions(prev => ({ ...prev, [activeHat]: version }))
+  function changeLevel(direction: 'easier' | 'deeper') {
+    const current = hatLevels[activeHat] ?? 0
+    const next = direction === 'easier' ? current - 1 : current + 1
+    if (next < LEVEL_MIN || next > LEVEL_MAX) return
+    setHatLevels(prev => ({ ...prev, [activeHat]: next }))
     contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
-    maybeGenerate(activeHat, version)
+    maybeGenerate(activeHat, next)
+    // Preload one more step in the same direction
+    maybeGenerate(activeHat, direction === 'easier' ? next - 1 : next + 1)
   }
 
-  const activeVersion = hatVersions[activeHat] ?? 'default'
-  const activeKey = cacheKey(activeHat, activeVersion)
+  const activeKey = cacheKey(activeHat, activeLevel)
   const content = cache[activeKey]
   const isActiveLoading = loading.has(activeKey)
   const activeHatMeta = HATS.find(h => h.id === activeHat)!
+  const canGoEasier = activeLevel > LEVEL_MIN
+  const canGoDeeper = activeLevel < LEVEL_MAX
 
   return (
     <div className="flex h-screen flex-col bg-zinc-50">
@@ -170,8 +190,8 @@ function LearnContent() {
         <div className="mx-auto max-w-2xl">
           <div className="flex gap-1.5">
             {HATS.map(h => {
-              const isDefaultLoading = loading.has(cacheKey(h.id, 'default'))
-              const isDefaultCached = !!cache[cacheKey(h.id, 'default')]
+              const isDefaultLoading = loading.has(cacheKey(h.id, 0))
+              const isDefaultCached = !!cache[cacheKey(h.id, 0)]
               return (
                 <button
                   key={h.id}
@@ -219,7 +239,7 @@ function LearnContent() {
               {HAT_DESCRIPTIONS[activeHat]}
             </p>
             <button
-              onClick={() => generate(activeHat, 'default')}
+              onClick={() => generate(activeHat, activeLevel)}
               className="rounded-xl bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-700"
             >
               Generate {activeHatMeta.label} Hat
@@ -234,32 +254,33 @@ function LearnContent() {
           <div className="mx-auto max-w-2xl flex items-center justify-between gap-4">
             <div className="flex gap-2">
               <button
-                onClick={() => applyDifficulty('easier')}
-                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
-                  activeVersion === 'easier'
-                    ? 'border-zinc-900 bg-zinc-900 text-white'
-                    : 'border-zinc-200 text-zinc-600 hover:border-zinc-400'
-                }`}
+                onClick={() => changeLevel('easier')}
+                disabled={!canGoEasier || isActiveLoading}
+                className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:border-zinc-400 disabled:opacity-30"
               >
                 Make this easier
               </button>
               <button
-                onClick={() => applyDifficulty('deeper')}
-                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
-                  activeVersion === 'deeper'
-                    ? 'border-zinc-900 bg-zinc-900 text-white'
-                    : 'border-zinc-200 text-zinc-600 hover:border-zinc-400'
-                }`}
+                onClick={() => changeLevel('deeper')}
+                disabled={!canGoDeeper || isActiveLoading}
+                className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:border-zinc-400 disabled:opacity-30"
               >
                 Let's go deeper
               </button>
             </div>
-            <Link
-              href="/dashboard"
-              className="text-xs font-medium text-zinc-500 hover:text-zinc-800"
-            >
-              Done →
-            </Link>
+            <div className="flex items-center gap-3">
+              {activeLevel !== 0 && (
+                <span className="text-[10px] text-zinc-400">
+                  {activeLevel < 0 ? `${Math.abs(activeLevel)} simpler` : `${activeLevel} deeper`}
+                </span>
+              )}
+              <Link
+                href="/dashboard"
+                className="text-xs font-medium text-zinc-500 hover:text-zinc-800"
+              >
+                Done →
+              </Link>
+            </div>
           </div>
         </div>
       )}
