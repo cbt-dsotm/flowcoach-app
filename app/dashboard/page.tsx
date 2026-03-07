@@ -107,29 +107,29 @@ interface LastGoal {
   confidence: number | null
 }
 
-function TierBadge({ label }: { label: string }) {
+function TierBadge({ label, size = 48 }: { label: string; size?: number }) {
   if (label === 'Basic') return (
-    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="24" cy="24" r="21" stroke="#e4e4e7" strokeWidth="2.5"/>
       <circle cx="24" cy="24" r="13" stroke="#e4e4e7" strokeWidth="1.5" strokeDasharray="3 2"/>
       <circle cx="24" cy="24" r="4" fill="#d4d4d8"/>
     </svg>
   )
   if (label === 'Good') return (
-    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M24 4L7 11v13C7 33 15 41 24 44c9-3 17-11 17-20V11L24 4z" fill="#3b82f6"/>
       <path d="M15 24l7 7 11-13" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   )
   if (label === 'Great') return (
-    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M24 2L42 13v22L24 46 6 35V13L24 2z" fill="#6366f1"/>
       <path d="M27 12L19 25h7L22 36l11-15h-7l1-9z" fill="white"/>
     </svg>
   )
   // Exceptional
   return (
-    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="24" cy="24" r="22" fill="#f59e0b"/>
       <circle cx="24" cy="24" r="22" fill="none" stroke="#fbbf24" strokeWidth="1.5"/>
       <path d="M13 34V24l7 5 4-10 4 10 7-5v10H13z" fill="white"/>
@@ -194,45 +194,40 @@ export default function Dashboard() {
       </header>
 
       <main className="mx-auto max-w-3xl px-6 py-10">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-zinc-900">Welcome back.</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            FlowCoach adapts to how you think and learn — keeping you in Flow state.
-          </p>
-        </div>
-
-        {/* Coaching status — dark band, full-bleed, no card */}
-        <div className={`-mx-6 mb-6 border-t-2 border-b border-b-white/10 px-6 py-4 ${tier.topAccent} ${tier.bandBg}`}>
-          <div className="flex items-center gap-4">
-            <TierBadge label={tier.label} />
-            <div className="flex flex-1 min-w-0 items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-bold text-white">{tier.label} coaching</p>
+        {/* Page opening — identity + status, no box */}
+        <div className="mb-8">
+          <div className="flex items-start justify-between gap-6">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold text-zinc-900">Welcome back.</h1>
+              <div className="mt-4 flex items-center gap-3">
+                <TierBadge label={tier.label} size={36} />
+                <div>
+                  <p className="text-sm font-semibold text-zinc-800">{tier.label} coaching</p>
+                  <p className="text-xs text-zinc-500">{tier.tagline}</p>
                 </div>
-                <p className="text-xs text-zinc-400">{tier.tagline}</p>
-              </div>
-              <div className="flex shrink-0 flex-col items-end gap-1.5">
-                {lastGoal ? (
-                  <Link
-                    href={`/learn?topic=${encodeURIComponent(lastGoal.topic)}${lastGoal.win_condition ? `&win=${encodeURIComponent(lastGoal.win_condition)}` : ''}${lastGoal.confidence ? `&confidence=${lastGoal.confidence}` : ''}`}
-                    className="max-w-[160px] truncate text-right text-xs font-medium text-zinc-200 hover:text-white"
-                    title={lastGoal.topic}
-                  >
-                    Continue: {lastGoal.topic} →
-                  </Link>
-                ) : (
-                  <span className="text-xs text-zinc-500">No topic yet</span>
-                )}
-                <span className="cursor-default select-none text-xs text-zinc-500">
-                  Pick a topic{' '}
-                  <span className="rounded-full bg-zinc-800 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-500">
-                    🚧 soon
-                  </span>
-                </span>
               </div>
             </div>
+            <div className="flex shrink-0 flex-col items-end gap-2 pt-1">
+              {lastGoal ? (
+                <Link
+                  href={`/learn?topic=${encodeURIComponent(lastGoal.topic)}${lastGoal.win_condition ? `&win=${encodeURIComponent(lastGoal.win_condition)}` : ''}${lastGoal.confidence ? `&confidence=${lastGoal.confidence}` : ''}`}
+                  className="max-w-[200px] truncate text-right text-sm font-medium text-zinc-700 hover:text-zinc-900"
+                  title={lastGoal.topic}
+                >
+                  Continue: {lastGoal.topic} →
+                </Link>
+              ) : (
+                <span className="text-sm text-zinc-400">No topic yet</span>
+              )}
+              <span className="cursor-default select-none text-xs text-zinc-400">
+                Pick a topic{' '}
+                <span className="rounded-full bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-400">
+                  🚧 soon
+                </span>
+              </span>
+            </div>
           </div>
+          <div className="mt-5 border-b border-zinc-200" />
         </div>
 
         {/* Profile — featured card */}
