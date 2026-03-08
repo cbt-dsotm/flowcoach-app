@@ -383,16 +383,16 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <main className="relative mx-auto max-w-3xl px-6 py-10">
+      <main className="relative mx-auto max-w-3xl px-4 py-10 sm:px-6">
         <div className="absolute inset-x-0 bottom-0 top-16 rounded-2xl bg-amber-50/30 backdrop-blur-sm border border-amber-700/20" />
         {/* Identity row: rank greeting left, profile status right */}
         <div className="relative mb-8 pt-20">
-          <div className="flex items-center justify-between gap-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
             {/* Left: badge + rank as the greeting — cream pill backdrop */}
             <div className="flex items-center gap-3 rounded-3xl bg-amber-100 px-5 py-3 shadow-sm border border-amber-300/60">
               <TierBadgeWithTooltip label={tier.label} size={44} />
               <div>
-                <h1 className="text-2xl font-bold text-zinc-900">
+                <h1 className="text-xl font-bold text-zinc-900 sm:text-2xl">
                   Welcome back, {tier.label}.
                 </h1>
                 <p className="mt-0.5 text-xs text-zinc-600">{tier.tagline}</p>
@@ -402,7 +402,7 @@ export default function Dashboard() {
             {/* Right: profile button — pill/capsule */}
             <Link
               href="/profile"
-              className="flex shrink-0 flex-col items-center rounded-3xl bg-violet-600 px-6 py-3 text-center shadow-sm transition-all hover:bg-violet-700 hover:shadow-md"
+              className="flex flex-col items-center rounded-3xl bg-violet-600 px-6 py-3 text-center shadow-sm transition-all hover:bg-violet-700 hover:shadow-md sm:shrink-0"
             >
               <span className="text-sm font-bold text-white">
                 {completed === 0 ? 'Build Your Profile' : completed < 7 ? 'Continue Profile' : 'Your Profile'}
