@@ -365,8 +365,9 @@ export default function Dashboard() {
   const profileLoaded = sectionsComplete !== null
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4">
+    <div className="relative min-h-screen" style={{ backgroundImage: "url('/map-bg-1k.png')", backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
+      <div className="absolute inset-0 bg-amber-950/50 pointer-events-none" />
+      <header className="relative border-b border-amber-800/30 bg-amber-50/80 backdrop-blur-sm px-6 py-4">
         <div className="mx-auto flex max-w-3xl items-center justify-between">
           <span className="text-sm font-bold text-zinc-900">FlowCoach</span>
           <div className="flex items-center gap-4">
@@ -382,9 +383,10 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-6 py-10">
+      <main className="relative mx-auto max-w-3xl px-6 py-10">
+        <div className="absolute inset-x-0 -mx-4 bottom-0 top-16 rounded-2xl bg-amber-50/30 backdrop-blur-sm" />
         {/* Identity row: rank greeting left, profile status right */}
-        <div className="mb-8">
+        <div className="relative mb-8 pt-20">
           <div className="flex items-center justify-between gap-6">
             {/* Left: badge + rank as the greeting */}
             <div className="flex items-center gap-3">
@@ -425,12 +427,12 @@ export default function Dashboard() {
         </div>
 
         {/* Topic row — below the rule, above mode cards */}
-        <div className="mb-4">
+        <div className="relative mb-4">
           <TopicSelector lastGoal={lastGoal} />
         </div>
 
         {/* Learning modes */}
-        <div>
+        <div className="relative">
           <div className="flex flex-col gap-3">
             {/* Live modes — full width */}
             {LEARNING_MODES.filter(m => m.live).map((mode) => (
