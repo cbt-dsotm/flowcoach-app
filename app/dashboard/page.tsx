@@ -15,12 +15,12 @@ const LEARNING_MODES = [
       "Explore any topic through Edward de Bono's Six Thinking Hats. Switch perspectives mid-session. Stay in Flow.",
     href: '/goal',
     live: true,
-    cardClass:   'border-2 border-emerald-400 bg-emerald-50 shadow-sm',
-    nameClass:   'text-emerald-900',
-    taglineClass:'text-emerald-700',
-    descClass:   'text-emerald-600',
+    cardClass:   'border-2 border-amber-500 bg-[#eef0e8] shadow-sm',
+    nameClass:   'text-[#3d4a2a]',
+    taglineClass:'text-[#4e5e35]',
+    descClass:   'text-[#5a6640]',
     badgeClass:  '',
-    buttonClass: 'bg-emerald-600 text-white hover:bg-emerald-700',
+    buttonClass: 'bg-[#4a5e2a] hover:bg-[#3d4f22] text-[#f5f0e0]',
   },
   {
     id: 'practice',
@@ -31,11 +31,11 @@ const LEARNING_MODES = [
       "Your coach asks you to retrieve, explain, and apply what you've learned. Feynman technique built in.",
     href: null,
     live: false,
-    cardClass:   'border-amber-200 bg-amber-50',
+    cardClass:   'border border-amber-400 bg-amber-100/70',
     nameClass:   'text-amber-900',
-    taglineClass:'text-amber-700',
-    descClass:   'text-amber-600',
-    badgeClass:  'bg-amber-100 text-amber-700',
+    taglineClass:'text-amber-800',
+    descClass:   'text-amber-700',
+    badgeClass:  'bg-amber-100 text-amber-800 border border-amber-400',
     buttonClass: '',
   },
   {
@@ -47,11 +47,11 @@ const LEARNING_MODES = [
       'Tell the Instructor what you want to master. They map the dive plan — surface concepts to deep-water expertise — and guide every session until you certify.',
     href: null,
     live: false,
-    cardClass:   'border-teal-200 bg-teal-50',
+    cardClass:   'border border-teal-600/50 bg-[#e8f0ee]',
     nameClass:   'text-teal-900',
-    taglineClass:'text-teal-700',
-    descClass:   'text-teal-600',
-    badgeClass:  'bg-teal-100 text-teal-700',
+    taglineClass:'text-teal-800',
+    descClass:   'text-teal-700',
+    badgeClass:  'bg-[#e8f0ee] text-teal-900 border border-teal-600/60',
     buttonClass: '',
   },
   {
@@ -63,11 +63,11 @@ const LEARNING_MODES = [
       'Cards generated from your learning sessions, scheduled when your brain is ready to consolidate.',
     href: null,
     live: false,
-    cardClass:   'border-rose-200 bg-rose-50',
-    nameClass:   'text-rose-900',
-    taglineClass:'text-rose-700',
-    descClass:   'text-rose-600',
-    badgeClass:  'bg-rose-100 text-rose-700',
+    cardClass:   'border border-rose-400/60 bg-[#f2e8e8]',
+    nameClass:   'text-rose-950',
+    taglineClass:'text-rose-900',
+    descClass:   'text-rose-800',
+    badgeClass:  'bg-[#f2e8e8] text-rose-900 border border-rose-400/70',
     buttonClass: '',
   },
   {
@@ -79,11 +79,11 @@ const LEARNING_MODES = [
       'Find exactly where you are and what to tackle next. No generic tests — calibrated to your level.',
     href: null,
     live: false,
-    cardClass:   'border-fuchsia-200 bg-fuchsia-50',
-    nameClass:   'text-fuchsia-900',
-    taglineClass:'text-fuchsia-700',
-    descClass:   'text-fuchsia-600',
-    badgeClass:  'bg-fuchsia-100 text-fuchsia-700',
+    cardClass:   'border border-purple-400/60 bg-[#ede8f2]',
+    nameClass:   'text-purple-950',
+    taglineClass:'text-purple-900',
+    descClass:   'text-purple-800',
+    badgeClass:  'bg-[#ede8f2] text-purple-900 border border-purple-400/70',
     buttonClass: '',
   },
 ]
@@ -113,9 +113,9 @@ function TierBadge({ label, size = 48 }: { label: string; size?: number }) {
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
       <polygon
         points="24,4 26,19 33,16 30,22 44,24 30,26 33,32 26,29 24,44 22,29 15,32 18,26 4,24 18,22 15,16 22,19"
-        stroke="#a1a1aa" strokeWidth="1.5" fill="none"
+        stroke="#d97706" strokeWidth="1.5" fill="none"
       />
-      <circle cx="24" cy="24" r="2.5" stroke="#a1a1aa" strokeWidth="1.5" fill="none"/>
+      <circle cx="24" cy="24" r="2.5" stroke="#d97706" strokeWidth="1.5" fill="none"/>
     </svg>
   )
   // Seeker: star lightly filled zinc, north petal lit in amber — direction found
@@ -277,9 +277,9 @@ function TopicSelector({ lastGoal }: { lastGoal: LastGoal | null }) {
       ) : (
         <Link
           href="/goal"
-          className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm font-medium text-zinc-500 shadow-sm transition-colors hover:border-zinc-300 hover:text-zinc-700"
+          className="flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-sm font-medium text-amber-700 shadow-sm transition-colors hover:border-amber-400 hover:text-amber-800"
         >
-          <span className="text-zinc-300">+</span>
+          <span className="text-amber-400">+</span>
           Set a topic
         </Link>
       )}
@@ -367,7 +367,7 @@ export default function Dashboard() {
   return (
     <div className="relative min-h-screen" style={{ backgroundImage: "url('/map-bg-1k.png')", backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
       <div className="absolute inset-0 bg-amber-950/50 pointer-events-none" />
-      <header className="relative border-b border-amber-800/30 bg-amber-50/80 backdrop-blur-sm px-6 py-4">
+      <header className="relative border-b border-amber-700/30 bg-amber-100/85 backdrop-blur-sm px-6 py-4">
         <div className="mx-auto flex max-w-3xl items-center justify-between">
           <span className="text-sm font-bold text-zinc-900">FlowCoach</span>
           <div className="flex items-center gap-4">
@@ -384,18 +384,18 @@ export default function Dashboard() {
       </header>
 
       <main className="relative mx-auto max-w-3xl px-6 py-10">
-        <div className="absolute inset-x-0 -mx-4 bottom-0 top-16 rounded-2xl bg-amber-50/30 backdrop-blur-sm" />
+        <div className="absolute inset-x-0 -mx-4 bottom-0 top-16 rounded-2xl bg-amber-50/30 backdrop-blur-sm border border-amber-700/20" />
         {/* Identity row: rank greeting left, profile status right */}
         <div className="relative mb-8 pt-20">
           <div className="flex items-center justify-between gap-6">
-            {/* Left: badge + rank as the greeting */}
-            <div className="flex items-center gap-3">
+            {/* Left: badge + rank as the greeting — cream pill backdrop */}
+            <div className="flex items-center gap-3 rounded-3xl bg-amber-100 px-5 py-3 shadow-sm border border-amber-300/60">
               <TierBadgeWithTooltip label={tier.label} size={44} />
               <div>
                 <h1 className="text-2xl font-bold text-zinc-900">
                   Welcome back, {tier.label}.
                 </h1>
-                <p className="mt-0.5 text-xs text-zinc-500">{tier.tagline}</p>
+                <p className="mt-0.5 text-xs text-zinc-600">{tier.tagline}</p>
               </div>
             </div>
 
