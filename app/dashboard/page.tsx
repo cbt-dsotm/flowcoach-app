@@ -201,7 +201,7 @@ function TierBadgeWithTooltip({ label, size = 44 }: { label: string; size?: numb
 
   return (
     <div
-      className="relative shrink-0 cursor-default"
+      className="relative shrink-0 cursor-pointer"
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
@@ -209,12 +209,13 @@ function TierBadgeWithTooltip({ label, size = 44 }: { label: string; size?: numb
         <TierBadge label={label} size={size} />
       </Link>
       {open && (
-        <div
-          className="absolute left-0 top-full z-20 mt-1 w-72 rounded-xl border border-zinc-200 bg-white p-3 shadow-xl"
+        <Link
+          href="/profile"
+          className="absolute left-0 top-full z-20 mt-1 w-72 rounded-xl border border-amber-300/60 bg-amber-50 p-3 shadow-xl block"
           onMouseEnter={handleEnter}
           onMouseLeave={handleLeave}
         >
-          <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+          <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700">
             Coaching levels
           </p>
           <div className="flex flex-col gap-3">
@@ -232,16 +233,16 @@ function TierBadgeWithTooltip({ label, size = 44 }: { label: string; size?: numb
                     <TierBadge label={t.label} size={32} />
                   </div>
                   <div>
-                    <p className={`text-xs transition-all ${isCurrent || isHovered ? 'font-bold text-zinc-900' : 'font-semibold text-zinc-500'}`}>
+                    <p className={`text-xs transition-all ${isCurrent || isHovered ? 'font-bold text-amber-950' : 'font-semibold text-amber-700/50'}`}>
                       {t.label}
                     </p>
-                    <p className="text-[11px] leading-snug text-zinc-400">{t.desc}</p>
+                    <p className="text-[11px] leading-snug text-amber-800/60">{t.desc}</p>
                   </div>
                 </div>
               )
             })}
           </div>
-        </div>
+        </Link>
       )}
     </div>
   )
@@ -388,8 +389,8 @@ export default function Dashboard() {
         {/* Identity row: rank greeting left, profile status right */}
         <div className="relative mb-8 pt-20">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-            {/* Left: badge + rank as the greeting — cream pill backdrop */}
-            <div className="flex items-center gap-3 rounded-3xl bg-amber-100 px-5 py-3 shadow-sm border border-amber-300/60">
+            {/* Left: badge + rank as the greeting — cream pill backdrop, links to profile */}
+            <Link href="/profile" className="flex items-center gap-3 rounded-3xl bg-amber-100 px-5 py-3 shadow-sm border border-amber-300/60 hover:bg-amber-200/70 transition-colors">
               <TierBadgeWithTooltip label={tier.label} size={44} />
               <div>
                 <h1 className="text-xl font-bold text-zinc-900 sm:text-2xl">
@@ -397,7 +398,7 @@ export default function Dashboard() {
                 </h1>
                 <p className="mt-0.5 text-xs text-zinc-600">{tier.tagline}</p>
               </div>
-            </div>
+            </Link>
 
             {/* Right: profile button — pill/capsule */}
             <Link
