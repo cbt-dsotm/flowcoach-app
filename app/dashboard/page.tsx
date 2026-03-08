@@ -365,7 +365,7 @@ export default function Dashboard() {
   const profileLoaded = sectionsComplete !== null
 
   return (
-    <div className="relative min-h-screen" style={{ backgroundImage: "url('/map-bg-1k.png')", backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
+    <div className="relative min-h-screen overflow-x-hidden" style={{ backgroundImage: "url('/map-bg-1k.png')", backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
       <div className="absolute inset-0 bg-amber-950/50 pointer-events-none" />
       <header className="relative border-b border-amber-700/30 bg-amber-100/85 backdrop-blur-sm px-6 py-4">
         <div className="mx-auto flex max-w-3xl items-center justify-between">
@@ -384,7 +384,7 @@ export default function Dashboard() {
       </header>
 
       <main className="relative mx-auto max-w-3xl px-6 py-10">
-        <div className="absolute inset-x-0 -mx-4 bottom-0 top-16 rounded-2xl bg-amber-50/30 backdrop-blur-sm border border-amber-700/20" />
+        <div className="absolute inset-x-0 bottom-0 top-16 rounded-2xl bg-amber-50/30 backdrop-blur-sm border border-amber-700/20" />
         {/* Identity row: rank greeting left, profile status right */}
         <div className="relative mb-8 pt-20">
           <div className="flex items-center justify-between gap-6">

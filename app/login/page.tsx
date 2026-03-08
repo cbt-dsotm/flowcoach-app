@@ -40,7 +40,7 @@ export default function Login() {
 
   return (
     <div
-      className="relative flex min-h-screen flex-col items-center justify-center px-6"
+      className="relative flex min-h-screen flex-col items-center justify-center overflow-x-hidden px-6"
       style={{
         backgroundImage: "url('/map-bg-1k.png')",
         backgroundSize: 'cover',
