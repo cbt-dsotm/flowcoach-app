@@ -17,8 +17,8 @@ const TIER_ORDER: ProfileTier[] = ['basic', 'good', 'great', 'exceptional']
 function TierBadge({ label, size = 32 }: { label: string; size?: number }) {
   if (label === 'Wanderer') return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="24,4 26,19 33,16 30,22 44,24 30,26 33,32 26,29 24,44 22,29 15,32 18,26 4,24 18,22 15,16 22,19" stroke="#a1a1aa" strokeWidth="1.5" fill="none"/>
-      <circle cx="24" cy="24" r="2.5" stroke="#a1a1aa" strokeWidth="1.5" fill="none"/>
+      <polygon points="24,4 26,19 33,16 30,22 44,24 30,26 33,32 26,29 24,44 22,29 15,32 18,26 4,24 18,22 15,16 22,19" stroke="#d97706" strokeWidth="1.5" fill="none"/>
+      <circle cx="24" cy="24" r="2.5" stroke="#d97706" strokeWidth="1.5" fill="none"/>
     </svg>
   )
   if (label === 'Seeker') return (

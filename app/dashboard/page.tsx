@@ -205,13 +205,10 @@ function TierBadgeWithTooltip({ label, size = 44 }: { label: string; size?: numb
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
-      <Link href="/profile" title="Build your profile">
-        <TierBadge label={label} size={size} />
-      </Link>
+      <TierBadge label={label} size={size} />
       {open && (
-        <Link
-          href="/profile"
-          className="absolute left-0 top-full z-20 mt-1 w-72 rounded-xl border border-amber-300/60 bg-amber-50 p-3 shadow-xl block"
+        <div
+          className="absolute left-0 top-full z-20 mt-1 w-72 rounded-xl border border-amber-300/60 bg-amber-50 p-3 shadow-xl"
           onMouseEnter={handleEnter}
           onMouseLeave={handleLeave}
         >
@@ -242,7 +239,7 @@ function TierBadgeWithTooltip({ label, size = 44 }: { label: string; size?: numb
               )
             })}
           </div>
-        </Link>
+        </div>
       )}
     </div>
   )
